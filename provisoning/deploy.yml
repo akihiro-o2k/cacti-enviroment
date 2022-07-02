@@ -1,0 +1,22 @@
+---
+
+- hosts: all
+  vars_files:
+    - vars/{{ stage }}.yml
+  roles:
+    - linux-base
+  tags:
+    - linux-base
+
+#
+#- hosts: db
+#  vars_files:
+#    - vars/{{ stage }}.yml
+#  roles:
+#    - postgresql
+#    - ntp-client
+#    - syslog-sender
+#  tags:
+#    - postgresql
+#    - ntp-client
+#    - syslog-sender
