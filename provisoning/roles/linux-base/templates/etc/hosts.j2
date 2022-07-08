@@ -2,7 +2,7 @@
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
-# 変数一覧より定義されたipとホスト名の配列リストを/etc/hostsとして書き出す
+# 自前resolving対象のip<->hostname
 {% for host in server_hosts %}
 {{ host }}
 {% endfor %}

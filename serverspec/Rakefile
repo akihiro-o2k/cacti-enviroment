@@ -2,7 +2,8 @@ require 'rake'
 require 'rspec/core/rake_task'
 
 # cacti配列にテスト対象を定義
-cacti=%w(linux-base httpd db)
+#cacti=%w(linux-base httpd db)
+cacti=%w(linux-base)
 
 # hostnameはserverspec実行端末の/etc/hostsで解決する方式で、開発環境／検証環境／商用環境の共有を図る。
 hosts = [
@@ -25,6 +26,7 @@ hosts = hosts.map do |host|
   }
 end
 
+# rake serverspecコマンドとして実行する[role形式テスト]の定義 
 desc "Run serverspec to all hosts"
 task :serverspec => 'serverspec:all'
 
@@ -38,3 +40,4 @@ namespace :serverspec do
     end
   end
 end
+
