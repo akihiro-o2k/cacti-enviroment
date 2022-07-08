@@ -8,15 +8,14 @@
   tags:
     - linux-base
 
-#
-#- hosts: db
+#- hosts: cacti
 #  vars_files:
 #    - vars/{{ stage }}.yml
 #  roles:
-#    - postgresql
+#    - httpd
+#    - mariadb
 #    - ntp-client
-#    - syslog-sender
 #  tags:
-#    - postgresql
+#    - httpd
+#    - mariadb
 #    - ntp-client
-#    - syslog-sender

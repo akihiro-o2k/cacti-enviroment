@@ -17,6 +17,14 @@
     src: etc/hosts.j2
     dest: /etc/hosts
 
+- name: create /etc/profile.d/prompt_color.sh
+  template:
+    src: etc/profile.d/prompt-color.sh.j2
+    dest: /etc/profile.d/prompt_coler.sh
+    owner: root
+    group: root
+    mode: 0644
+
 #- name: specify DNS
 #  lineinfile:
 #    state: present

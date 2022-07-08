@@ -11,6 +11,10 @@
 - user_list:
   - { u_name: visualize, groups: 'lxd,sudo', pass: Visualize0033#, shell: /bin/bash, home: /home/visualize }
 
+- prompt:
+  # develop(32->green)
+  - \[\e[1;32m\][\u@\h \W]\\$ \[\e[m\]
+
 #- ntp_upstream_servers:
 #  - 10.39.64.3
 #  - 10.39.72.3
