@@ -11,6 +11,7 @@
 - hosts: cacti
   vars_files:
     - vars/{{ stage }}.yml
+    - vars/common.yml
   roles:
     - httpd
 #    - mariadb
