@@ -1,0 +1,51 @@
+---
+
+# Apache2.4のインストール
+- name: Install Apache2
+  become: yes
+  apt: pkg=apache2 state=latest
+
+- shell: apache2 -v
+  register: apache_version
+
+# 起動時有効化設定
+- name: http service state
+  become: yes
+  service:
+    name: apache2
+    state: started
+    enabled: yes
+
+# ->Ubuntu20でインストールできるphpは7.4の為、リポジトリを追加
+- name: Install repository ppa:ondrej/php
+  become: yes
+  expect:
+    command: add-apt-repository ppa:ondrej/php
+    responses:
+      # 対話式で期待する文字列が発生したら空白[＋Enter]を送信
+      'Press \[ENTER\] to continue or Ctrl-c to cancel adding it.': ''
+
+# php8.0以降のパッケージをインストールする為にaptリポジトリの更新
+- name: Apt update
+  become: yes
+  apt:
+    update_cache: yes
+
+# php.versionをインストール
+- name: Install php8.0
+  become: yes
+  apt:
+    name: php8.0
+
+# php-modulesをインストール(cactiに必要)
+- name: Install php Modules
+  become: yes
+  apt:
+    name:
+      - libapache2-mod-php8.0
+      - php8.0-mysql
+      - php8.0-xml
+      - php8.0-ldap
+      - php8.0-mbstring
+      - php8.0-gd
+      - php8.0-gmp

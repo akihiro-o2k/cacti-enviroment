@@ -15,6 +15,12 @@
   # develop(32->green)
   - \[\e[1;32m\][\u@\h \W]\\$ \[\e[m\]
 
+- php:
+  - version: 
+    - php8.0
+  # php-xml php-ldap php-mbstring php-gd php-gmp 
+  - packages: [php8.0-xml, php8.0-ldap, php8.0-mbstring, php8.0-gd, php8/0-gmp, php8.0-mysql]
+
 #- ntp_upstream_servers:
 #  - 10.39.64.3
 #  - 10.39.72.3
