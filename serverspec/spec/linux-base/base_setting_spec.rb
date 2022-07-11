@@ -7,31 +7,29 @@ describe "OS のバージョンは Ubuntu 20.04 であることを確認する" 
   end
 end
 
-# /etc/hostsファイルが存在する事
-describe file('/etc/hosts') do
-  it { should be_file }
-end
-
-# 名前解決用に各種サーバー名が定義されている事。
-describe file('/etc/hosts') do
-  it { should contain 'cacti01' }
-  it { should contain 'cacti02' }
-end
-
-# hostname = host_inventory['hostname']
-# 本当に名前解決できているか確認
-hosts = %w(cacti01 cacti02 mssql01 mssql02)
-hosts.each do |target|
-  describe host(target) do
-    it { should be_resolvable }
+# test /etc/hosts
+describe '/etc/hosts関連設定の確認' do
+  hosts = %w(cacti01 cacti02 mssql01 mssql02)
+  describe file('/etc/hosts') do
+    it { should be_file }
+    describe '名前解決用に各種サーバー名が定義されている事。' do
+      hosts.each { |host| it { should contain host } }
+    end
+    describe "/etc/hostsの定義が本当に名前解決できているか確認" do
+      hosts.each do |host|
+        describe host(host) { it { should be_resolvable } }
+      end
+    end
   end
 end
 
-# プロンプト色設定ファイルの存在確認
-describe file('/etc/profile.d/prompt_coler.sh') do
-  it { should be_file }
-  it { should be_mode 644 }
-  it { should be_owned_by 'root' }
-  it { should be_grouped_into 'root' }
-  it { should contain 'PS1' }
+# test /etc/profile.d/prompt_color
+describe 'プロンプト色設定シェルの設定確認' do
+  describe file('/etc/profile.d/prompt_color.sh') do
+    it { should be_file }
+    it { should be_mode 644 }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
+    it { should contain 'PS1' }
+  end
 end

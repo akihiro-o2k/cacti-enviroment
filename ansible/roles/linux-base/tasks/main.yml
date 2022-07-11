@@ -1,5 +1,6 @@
 ---
 
+# 
 - name: Update and upgrade apt packages
   apt:
     upgrade: "yes"
@@ -11,12 +12,16 @@
       - git
       - traceroute
       - build-essential
+      - curl
+      - wget
 
+# provisoning /etc/hosts
 - name: update /etc/hosts
   template:
     src: etc/hosts.j2
     dest: /etc/hosts
 
+# provisoning /etc/profile.d/prompt_color.sh
 - name: create /etc/profile.d/prompt_color.sh
   template:
     src: etc/profile.d/prompt-color.sh.j2

@@ -8,11 +8,11 @@
   tags:
     - linux-base
 
-#- hosts: cacti
-#  vars_files:
-#    - vars/{{ stage }}.yml
-#  roles:
-#    - httpd
+- hosts: cacti
+  vars_files:
+    - vars/{{ stage }}.yml
+  roles:
+    - httpd
 #    - mariadb
 #    - ntp-client
 #  tags:
