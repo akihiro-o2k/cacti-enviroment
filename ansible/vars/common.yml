@@ -1,3 +1,6 @@
+---
+
+- server_os: 'Ubuntu 20.04'
 - user_list:
   - { u_name: visualize, groups: 'lxd,sudo', pass: Visualize0033#, shell: /bin/bash, home: /home/visualize }
 
