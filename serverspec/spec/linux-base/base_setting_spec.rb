@@ -1,4 +1,7 @@
 require 'spec_helper'
+require 'yaml'
+
+COMMON = YAML.load_file('spec/vars/common.yml').freeze
 
 # test Ubuntu version
 describe "OS のバージョンは Ubuntu 20.04 であることを確認する" do
@@ -23,9 +26,9 @@ describe '/etc/hosts関連設定の確認' do
   end
 end
 
-# test /etc/profile.d/prompt_color
+# test /etc/profile.d/prompt_coler.sh
 describe 'プロンプト色設定シェルの設定確認' do
-  describe file('/etc/profile.d/prompt_color.sh') do
+  describe file('/etc/profile.d/prompt_coler.sh') do
     it { should be_file }
     it { should be_mode 644 }
     it { should be_owned_by 'root' }
