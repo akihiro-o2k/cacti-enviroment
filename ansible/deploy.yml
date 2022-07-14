@@ -3,6 +3,7 @@
 - hosts: all
   vars_files:
     - vars/{{ stage }}.yml
+    - vars/common.yml
   roles:
     - linux-base
   tags:

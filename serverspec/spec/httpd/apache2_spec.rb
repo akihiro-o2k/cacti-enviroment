@@ -4,7 +4,6 @@ require 'spec_helper'
 # 定数定義
 COMMON = YAML.load_file('spec/vars/common.yml').freeze
 PHP_INI = { :ini => COMMON[2]['php_ini_path'] }.freeze
-p ENV['ENVIROMENT']
 
 describe 'apache2.4パッケージがインストールされている事。' do
   describe package('apache2'), :if => os[:family] == 'ubuntu' do
@@ -65,11 +64,14 @@ end
 
 describe 'PHP_config関連のテスト' do
   # php.ini事態の存在確認。
-  describe file(COMMON[3]['php_ini_path']) do
+  describe file(COMMON[4]['php_ini_path']) do
     it { should be_file }
     it { should be_mode 644 }
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
+    # 独自設定箇所
+    its(:content) { should match /memory_limit = #{COMMON[6]['php_memory_limit']}/ }
+    its(:content) { should match /max_execution_time = #{COMMON[7]['php_max_execution_time']} / }
   end
 =begin
   context  php_config('default_mimetype', PHP_INI) do
