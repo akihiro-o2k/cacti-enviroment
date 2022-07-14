@@ -39,6 +39,7 @@
 
 # Apache2へconfig適用(reload)
 - name: Reload Apache2
+  become: yes
   service: name=apache2 state=reloaded
 
 # 起動時有効化設定
@@ -76,6 +77,16 @@
   apt:
     name:
       "{{ php_packages }}"
+
+
+- name: create "{{php_ini_path}}"
+  template:
+    src:  "{{php_ini_template_path}}"
+    dest: "{{php_ini_path}}"
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
 
 # Module追加後にapache2のリロード
 - name: Reload service apache2, in all cases

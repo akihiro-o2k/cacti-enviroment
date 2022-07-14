@@ -17,18 +17,51 @@
 
 # provisoning /etc/hosts
 - name: update /etc/hosts
+  become: yes
   template:
     src: etc/hosts.j2
     dest: /etc/hosts
-
-# provisoning /etc/profile.d/prompt_color.sh
-- name: create /etc/profile.d/prompt_color.sh
-  template:
-    src: etc/profile.d/prompt-color.sh.j2
-    dest: /etc/profile.d/prompt_coler.sh
     owner: root
     group: root
     mode: 0644
+
+# provisoning /etc/profile.d/prompt_color.sh
+- name: create /etc/profile.d/prompt_color.sh
+  become: yes
+  template:
+    src: etc/profile.d/prompt-color.sh.j2
+    dest: /etc/profile.d/prompt_coler.sh
+    backup: true 
+    owner: root
+    group: root
+    mode: 0644
+
+- name: create /etc/systemd/timesyncd.conf
+  become: yes
+  template:
+    src: etc/systemd/timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf
+    backup: true 
+    owner: root
+    group: root
+    mode: 0644
+
+# timesyncd 設定変更を適用
+- name: Restert systemd-timesyncd
+  become: yes
+  service: name=systemd-timesyncd state=restarted
+
+# 起動時有効化設定
+- name: systemd-timesyncd service state
+  become: yes
+  service:
+    name: systemd-timesyncd
+    state: started
+    enabled: yes
+
+- name: Set timezone to Asia/Tokyo
+  timezone:
+    name: "{{ time_zone }}"
 
 #- name: specify DNS
 #  lineinfile:
