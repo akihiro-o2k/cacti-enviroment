@@ -1,5 +1,10 @@
 require 'serverspec'
 require 'net/ssh'
+require 'lib/ansible_vars'
+
+# 全体的用する定数を読み込み
+COMMON = AnsibleVars.to_hash('spec/vars/common.yml').freeze
+ENVIROMENT = AnsibleVars.to_hash("spec/vars/#{ENV['ENVIROMENT']}.yml").freeze
 
 set :backend, :ssh
 
@@ -34,3 +39,4 @@ set :ssh_options, options
 
 # Set PATH
 # set :path, '/sbin:/usr/local/sbin:$PATH'
+

@@ -1,9 +1,5 @@
 require 'spec_helper'
-require 'yaml'
 
-# 定数定義セクション
-COMMON = YAML.load_file('spec/vars/common.yml').freeze
-ENVIROMENT = YAML.load_file("spec/vars/#{ENV['ENVIROMENT']}.yml").freeze
 
 # test Ubuntu version
 describe "OS のバージョンは Ubuntu 20.04 であることを確認する" do
@@ -40,15 +36,15 @@ describe 'プロンプト色設定シェルの設定確認' do
 end
 
 describe "NTP参照先設定の確認" do
-  ENVIROMENT[2]['ntp_servers'].each do |ntpd|
+  ENVIROMENT['ntp_servers'].each do |ntpd|
     describe command("timedatectl timesync-status | grep Server") do
       its(:stdout) { should match /#{ntpd}/ }
     end
   end
 end
 
-describe "timezone設定値が'#{COMMON[3]['time_zone']}'である事" do
+describe "timezone設定値が'#{COMMON['time_zone']}'である事" do
   describe command("timedatectl | grep 'Time zone'") do
-      its(:stdout) { should match /#{COMMON[3]['time_zone']}/ }
+      its(:stdout) { should match /#{COMMON['time_zone']}/ }
   end
 end
