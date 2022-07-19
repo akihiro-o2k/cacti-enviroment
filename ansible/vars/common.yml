@@ -1,6 +1,4 @@
 ---
-# Warning!! serverspecから読み込む際には配列となる為、
-# 現在、並び順を変更する際はserverspec側のコード変更が必要となる。
 
 - server_os: 'Ubuntu 20.04'
 - user_list:
