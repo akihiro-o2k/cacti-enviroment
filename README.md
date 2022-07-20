@@ -72,6 +72,11 @@
       sudo netplan apply
       ```
   1. cacti01/02への名前解決設定(/etc/hostsで名前解決)
+     ```bash
+     # ipはお客様指定の値
+     XXX.XXX.XXX.XX1  cacti01
+     XXX.XXX.XXX.XX2  cacti02
+     ```
   1. SSH公開鍵作成(ED25519鍵)
       ```bash
       # 参考-> https://linuxfan.info/ssh-ed25519
@@ -115,15 +120,15 @@
       # 確認コマンド
       rake -V
       ```
-  - cacti01/02(共通)
-    1. Ubuntu20.04のインストール[^1]
-    1. ホスト名設定[^1]
-    1. sshserverインストール[^1]
-    1. 初期ユーザーにdevelopユーザー追加[^2]
-    1. 固定IP設定ファイル編集
-        - 構築用VM側の手順を参照。
-    1. netplanコマンドの実行(固定IP設定の適用)
-        - 構築用VM側の手順を参照。
+#### cacti01/02(共通)
+  1. Ubuntu20.04のインストール[^1]
+  1. ホスト名設定[^1]
+  1. sshserverインストール[^1]
+  1. 初期ユーザーにdevelopユーザー追加[^2]
+  1. 固定IP設定ファイル編集
+      - 構築用VM側の手順を参照。
+  1. netplanコマンドの実行(固定IP設定の適用)
+      - 構築用VM側の手順を参照。
 
 
 ### サーバープロビジョニング／テスト実行方法
@@ -133,7 +138,7 @@
       - `git@github.com:akihiro-o2k/cacti-enviroment.git cacti_enviroment`
   1. 取得したディレクトリに遷移
       - `cd cacti_enviroment`
-  1. 開発中はdevelopブランチを使用している為、合わせて取得
+  1. 開発中はdevelopブランチを使用している為、合わせて取得（商用環境においては全てmainブランチにマージして適用する）
       - `git checkout -b develop remotes/origin/develop`
       - `git checkout develop`
   1. スクリプト実行対象のサーバーにcacti01,cacti02でそれぞれ名前解決できるように/etc/hostsを編集。
