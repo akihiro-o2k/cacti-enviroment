@@ -21,3 +21,4 @@
 - php_max_execution_time: 300
 - php_memory_limit: 256M
 
+- mariadb_varsion: '10.8'
