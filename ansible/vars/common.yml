@@ -18,5 +18,6 @@
 
 - php_ini_path: /etc/php/8.0/cli/php.ini
 - php_ini_template_path: etc/php/8.0/cli/php.ini.j2
-- php_memory_limit: 256M
 - php_max_execution_time: 300
+- php_memory_limit: 256M
+

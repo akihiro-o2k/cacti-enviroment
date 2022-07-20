@@ -7,6 +7,17 @@ describe "OS のバージョンは Ubuntu 20.04 であることを確認する" 
     its(:stdout) { should match /Ubuntu 20.04/ }
   end
 end
+# 開発環境意外での確認項目。/etc/profile.d/proxy_setting.shの存在確認。
+if ENV['ENVIROMENT']!='development' then
+  describe '/etc/profile.d/proxy_setting.shの存在確認' do
+    describe file('/etc/profile.d/proxy_setting.sh') do
+      it { should be_file }
+      it { should be_mode 711 }
+      it { should be_owned_by 'root' }
+      it { should be_grouped_into 'root' }
+    end
+  end
+end
 
 # test /etc/hosts
 describe '/etc/hosts関連設定の確認' do

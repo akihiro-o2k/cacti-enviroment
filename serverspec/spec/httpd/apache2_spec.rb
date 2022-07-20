@@ -67,19 +67,13 @@ describe 'PHP_config関連のテスト' do
     it { should be_mode 644 }
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
-    # 独自設定箇所
-    its(:content) { should match /memory_limit = #{COMMON['php_memory_limit']}/ }
-    its(:content) { should match /max_execution_time = #{COMMON['php_max_execution_time']} / }
+    # TODO:max_execution_timeパラメータのみphp_config用テストメソッドでフック出来なかった為正規表件で確認。
+    its(:content) { should match /max_execution_time = #{COMMON['php_max_execution_time']}/ }
   end
-=begin
-  context  php_config('default_mimetype', PHP_INI) do
-    its(:value) { should eq 'text/html' }
+  context  php_config('memory_limit', PHP_INI) do
+    its(:value) { should eq COMMON['php_memory_limit'] }
   end
-  context php_config('session.cache_expire', PHP_INI) do
-    its(:value) { should eq 180 }
+  context  php_config('date.timezone', PHP_INI) do
+    its(:value) { should eq COMMON['time_zone'] }
   end
-  context php_config('mbstring.http_output_conv_mimetypes', PHP_INI) do
-    its(:value) { should match /application/ }
-  end
-=end
 end
