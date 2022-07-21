@@ -38,9 +38,14 @@
     var: a2_result
 
 # Apache2へconfig適用(reload)
-- name: Reload Apache2
-  become: yes
-  service: name=apache2 state=reloaded
+#- name: Reload Apache2
+#  become: yes
+#  service: name=apache2 state=reloaded
+- name: Restart service apache2, in all cases
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+
 
 # 起動時有効化設定
 - name: http service state

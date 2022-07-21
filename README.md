@@ -186,7 +186,7 @@
         │   ├── development.ini     (開発環境イベントリ)
         │   ├── staging.ini         (検証環境イベントリ)
         │   ├── production.ini      (商用環境イベントリ)
-        │   ├── roles               (プロビジョニング実設定格納ディレクトリ)
+        │   ├── roles               (実設定格納ディレクトリ)
         │   │   ├── httpd           (httpd設定)
         │   │   └── linux-base      (os設定)
         │   │   └── db              (mariadb設定)

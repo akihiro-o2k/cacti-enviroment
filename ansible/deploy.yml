@@ -15,7 +15,7 @@
     - vars/common.yml
   roles:
     - httpd
-#    - mariadb
+    - db
 #    - ntp-client
 #  tags:
 #    - httpd
