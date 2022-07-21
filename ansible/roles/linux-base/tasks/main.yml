@@ -10,8 +10,8 @@
     group: root
     mode: 711
   # 適用すべき環境はstageを参照して切り替え
-  # when: stage == 'production_com' or stage == 'production_biz'
-  when: stage != 'deveropment'
+  when: stage == 'production_com' or stage == 'production_biz'
+  # when: stage != 'deveropment'
 
 # 上記proxy_setting.shだけではaptが実行できない場合のみ有効化する。
 #- name: create /etc/apt/apt.conf.d/30proxy
