@@ -34,6 +34,7 @@
   become: yes
   apt:
     name:
+      # その他、必要となるmariadbパッケージがあれば配列に追加。
       - mariadb-server
       - mariadb-client
     state: latest
