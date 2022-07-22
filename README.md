@@ -68,7 +68,7 @@
   1. 固定IP設定ファイル編集
       ```bash
       # 既存の設定ファイル名の末尾にdisabledを付けて無効化しつつバックアップ
-      sudo cp -p /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.disabled
+      sudo mv /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.disabled
       # 新規設定ファイルを01として記述
       sudo cp -p /etc/netplan/00-installer-config.yaml.disabled /etc/netplan/01-installer-config.yaml
       ```
@@ -87,7 +87,7 @@
   1. netplanコマンドの実行(固定IP設定の適用)
       ```bash
       sudo netplan try --timeout 5
-      sudo netplan apply
+      # sudo netplan apply
       ```
   1. cacti01/02への名前解決設定(/etc/hostsで名前解決)
      ```bash
