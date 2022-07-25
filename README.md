@@ -35,8 +35,6 @@
     - ppa:ondrej/php
     - oftware-properties-common
     - dirmngr
-    - ca-certificates
-    - apt-transport-https
 
 ## サーバー構成
 - 基本設計
@@ -232,6 +230,12 @@
           # ロールは現在all,cacit(01/02の同時実行),c1(cacti01のみ),c2(cacti02のみ)を想定。
           # ->Option： -C(Dry Runの実行),-v(詳細表示。vの数でより詳細情報を表示) 
           ansible-playbook -i ${ENVIROMENT}.ini -l cacti deploy.yml -vvv
+          # mariadbインストールのみ、ansible-garaxyより、コミュニティー作成のroleを取得して利用(MITライセンス)。
+          # https://github.com/mahdi22/ansible-mariadb-install
+          # 以下、ansibleディレクトリで上記Roleを導入するコマンドを実行。
+          ansible-galaxy install mahdi22.mariadb_install -p ansible/roles/
+          # タイプ文字列が長いのでリネーム
+          mv mahdi22.ansible-mariadb-install db
           ```
     1. serverspecの再実行(設定完了を確認)
         - serverspecを実行し、ansibleスクリプト実行後のCacti01/02の状態を確認する。
