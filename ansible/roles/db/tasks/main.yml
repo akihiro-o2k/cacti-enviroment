@@ -1,52 +1,18 @@
-# mariadbリポジトリ追加に依存関係があるパッケージのインストール
-- name: install dependencies packages
-  apt:
-    name:
-      - software-properties-common
-      - dirmngr
-      - ca-certificates
-      - apt-transport-https
+---
+# tasks file for mariadb
+- name: include distribution dependency variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution_file_variety }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+- name: Install MariaDB
+  include_tasks: "{{ ansible_distribution_file_variety }}-install.yml"
 
-# Mariadbのリポジトリ一覧でdistributionと利用versionを入力してMirrorSite情報を取得する。
-# https://mariadb.org/download/?t=repo-config&d=20.04+%22focal%22&v=10.8&r_m=yamagata-university
-# 
-# mariadbインストールリポジトリとして山形大学のkeyring files をtrusted.gpg.dに格納する。
-# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_key_module.html
-- name: Add an Apt signing key, uses whichever key is at the URL
-  ansible.builtin.apt_key:
-    url: https://mariadb.org/mariadb_release_signing_key.asc
-    state: present
+- name: Configure MariaDB server
+  include_tasks: configure-mariadb.yml
 
-# 信頼済みリポジトリである山形大学のmariadbミラーリポジトリを追加。
-# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_repository_module.html
-- name: Add specified repository into sources list
-  ansible.builtin.apt_repository:
-    repo: deb https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/{{mariadb_varsion}}/ubuntu focal main
-    state: present
+- name: Mysql secure install
+  include_tasks: mysql_secure.yml
 
-- name: Apt update
-  become: yes
-  apt:
-    update_cache: yes
-
-# mariadb-serverインストール
-- name: Install MariaDB Server
-  become: yes
-  apt:
-    name:
-      # その他、必要となるmariadbパッケージがあれば配列に追加。
-      - mariadb-server
-      - mariadb-client
-    state: latest
-    update_cache: yes
-
-# TODO:my.cnfのupload処理
-
-# 起動時有効化設定
-- name: http service state
-  become: yes
-  service:
-    name: mariadb
-    state: started
-    enabled: yes
-
+- name: Initiate Databses users and table
+  include_tasks: initiate_database.yml
