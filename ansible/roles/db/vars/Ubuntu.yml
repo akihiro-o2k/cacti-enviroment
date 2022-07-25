@@ -1,0 +1,13 @@
+mariadb_packages:
+  - mariadb-server
+  - mariadb-common
+  - python-openssl
+  - python3-mysqldb
+repo_software_package:
+  - software-properties-common 
+  - dirmngr
+key_url: "https://mariadb.org/mariadb_release_signing_key.asc"
+# default値のままだとmariadb_varsion変数を参照できなかった為、var/common.yml内部で
+# mariadb_repo変数を定義し、ミラーサーバのURIとインストール対象varsionを定義。
+repo_deb: "{{ mariadb_repo }}" 
+mariadb_socket: /run/mysqld/mysqld.sock
