@@ -23,6 +23,7 @@
 
 # ansible-galaxy install mahdi22.mariadb_install 
 - mariadb_version: "10.8"
+- bind-address: '127.0.0.1'
 - deny_remote_connections: true
 - mysql_root_password: "TrustNo1"
 - create_database: true
@@ -31,7 +32,7 @@
 - db_user_name: cactiuser
 - db_user_password: cactiuser
 # 独自改修箇所:ミラーサイトとバージョンを同一URIで変数渡し
-- mariadb_repo: 'deb https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.8/ubuntu focal main'
+- mariadb_repo: 'deb https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.8/ubuntu'
 
 # 以下、状況により利用するオプションをコメントアウト
 #- use_proxy: yes
