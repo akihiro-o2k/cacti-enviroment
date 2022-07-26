@@ -126,7 +126,7 @@
       ```
   1. サーバー構成テストツール：sarverspecインストール
       ```bash
-      sudo apt install ruby
+      sudo apt install ruby ruby-dev
       # rubyパッケージ管理システムgemは、環境変数http_proxyを参照してproxyの適用を判断する。
       sudo gem install serverspec
       # 確認コマンド
@@ -135,6 +135,8 @@
       sudo gem install rake
       # 確認コマンド
       rake -V
+      # 依存関係パッケージのインストール(公開鍵認証->ed25519対応の為のパッケージ)
+      sudo gem install highline ed25519 bcrypt_pbkdf
       ```
 #### cacti01/02(共通)
   1. Ubuntu20.04のインストール[^2]
@@ -165,6 +167,7 @@
         ```bash
         export SUDO_PASSWD=[cacti01,02で共通するdevlopユーザーのパスワード]
         export ENVIROMENT=development
+        export SSH_KEY=/home/develop/.ssh/id_ed25519
         # 設定追記後はsource ~develop/.bashrc等で設定を反映する必要あり。
         ```
 - サーバープロビジョニングの実施
@@ -184,7 +187,7 @@
         │   ├── development.ini     (開発環境イベントリ)
         │   ├── staging.ini         (検証環境イベントリ)
         │   ├── production.ini      (商用環境イベントリ)
-        │   ├── roles               (実設定格納ディレクトリ)
+        │   ├── roles               (プロビジョニング実設定格納ディレクトリ)
         │   │   ├── httpd           (httpd設定)
         │   │   └── linux-base      (os設定)
         │   │   └── db              (mariadb設定)
