@@ -16,8 +16,6 @@
   roles:
     - httpd
     - db
-#    - ntp-client
-#  tags:
-#    - httpd
-#    - mariadb
-#    - ntp-client
+  tags:
+    - httpd
+    - db
