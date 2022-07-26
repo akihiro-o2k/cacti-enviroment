@@ -4,9 +4,11 @@ describe 'mariadb-serverパッケージがインストールされている事�
   describe package('mariadb-server'), :if => os[:family] == 'ubuntu' do
     it { should be_installed }
   end
-  describe command("apt list --installed | grep mariadb-server-#{COMMON['mariadb_version']}") do
-    # mariadb-server-10.8/
-    its(:stdout)  { should match /^mariadb-server-10.8\// }
+  describe "指定バージョン'#{COMMON['mariadb_version']}'でインストールされている事" do
+    describe command("apt list --installed | grep mariadb-server-#{COMMON['mariadb_version']}") do
+      # mariadb-server-10.8/
+      its(:stdout)  { should match /^mariadb-server-10.8\// }
+    end
   end
 end
 describe 'systemd関連:mariadbの起動と再起動時の動作を確認' do
@@ -31,34 +33,25 @@ describe 'MySQL config parameters' do
   end
 end
 =end
-=begin
-describe command("mysqlshow -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']}") do
-  it { should return_stdout /cacti/ }
-end
-=end
-describe "rootユーザーのmysqlshow実行結果:配列のDBが表示される事" do
-  array = %w(cacti information_schema mysql performance_schema sys)
-  describe command("mysqlshow -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']}") do
-    array.each do |param|
-      its(:stdout)  { should match /#{param}/ }
+describe "mariadb userの参照可能DB確認" do
+  describe "rootユーザーでmysqlshow実行結果:" do
+    grant = %w(cacti information_schema mysql performance_schema sys)
+    describe command("mysqlshow -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']}") do
+      grant.each do |param|
+        its(:stdout)  { should match /#{param}/ }
+      end
     end
   end
 end
-describe "#{COMMON['db_user_name']}ユーザーのmysqlshow実行結果:配列のDBが表示される事" do
+describe "#{COMMON['db_user_name']}ユーザーのmysqlshow実行結果:" do
   describe command("mysqlshow -u#{COMMON['db_user_name']} -p#{COMMON['db_user_password']} -h#{COMMON['bind-address']}") do
      %w(cacti information_schema).each do |param|
       its(:stdout)  { should match /#{param}/ }
     end
   end
 end
-
-
-=begin
-describe command("mysql -u#{COMMON['db_user_name']} -p#{COMMON['db_user_password']} cacti") do
-  it { should return_stdout /hosts/ }
+describe 'character_set_serverの確認:' do
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep character_set_server") do
+    its(:stdout)  { should match /utf8mb4/ }
+  end
 end
-
-describe command("mysqladmin -u#{COMMON['db_user_name']} -p#{COMMON['db_user_password']} variables |grep character_set_server") do
-  it { should return_stdout /utf8mb4/ }
-end
-=end
