@@ -5,7 +5,7 @@
 - 見える化案件において冗長構成かつ複数網に同一構成のサーバーを構築する要件の実現方式として、
   サーバープロビジョニング及び、構成のテストをスクリプトにて自動実行を行う。
 
-#### 設計へのインプットとなる関連文書・仕様
+### 設計へのインプットとなる要件及び、関連文書・仕様
   - お客様配布文書「(セキュリティ関連で現状は伏字XXX)」の求める仕様に準拠する。
   - 上記文書の要件に基づいて導入するサーバー及びミドルウェア、ソフトウェアは「技術アーキテクチャ標準細則(第17.0版)」及び、外部文書「(別表1)標準化技術リスト(製品サポート情報etc)_20220629」の要件に準拠する。
 
@@ -19,8 +19,11 @@
   - serverspec (2.42.0)
     - ruby 2.7.0p0 (2019-12-25 revision 647ee6f091) [x86_64-linux-gnu]
     - rake, version 13.0.6
+- 特記事項
+  - 動作環境(サーバープロビジョニング及び、サーバーテスト方式)の各種アプリケーションプラットフォームは要件を充足する上で便宜的に構築する副産物である為、「設計へのインプットとなる要件及び関連文書・仕様」で求められる技術標準化リストのバージョンを考慮せず、OS安定版として提供するバージョンの物を使用する。
+  - 上記のサーバープロビジョニング／テスト動作環境を便宜的に「管理用VM」と定義し当該文書上に記載する。
 
-- ミドルウェア
+### ミドルウェア
   - 選定基準
     - Cactiの動作に必要となるミドルウェアを「設計へのインプットとなる関連文書・仕様」で定義の文書に照らし合わせ、標準利用可能なっているミドルウェア・バージョンを選定する。
   - 必須ミドルウェア(バージョン)
@@ -35,15 +38,26 @@
     - ppa:ondrej/php
     - oftware-properties-common
     - dirmngr
+    - snmp
+    - snmpd
+    - rrdtool
+    - libmysql++-dev
+    - libsnmp-dev
+    - help2man
+    - dos2unix
+    - autoconf
+    - dh-autoreconf
+    - libssl-dev
+    - librrds-perl
 
 ## サーバー構成
-- 基本設計
+### 基本設計
   - 「構築XXXXXXXXXX」６頁の「基盤構成」に記載の要件に準拠する。
       ```bash
       vFW
       │
       vLB
-      ├── 構築用VM:(ansible/serverspecの実行ホスト)
+      ├── 管理用VM:(ansible/serverspecの実行ホスト)
       ├── NPM01
       ├── NPM02
       ├── (状況によりVIPを設定(仕様未確定))
@@ -58,7 +72,7 @@
 ### 基本構築手順
 - 各サーバー毎にスクリプトでプロビジョニング／テストを実行する為の最低限の環境を手動で構築する。
 
-#### 構築用VM
+#### 管理用VM
   1. Ubuntu20.04のインストール[^2]
   1. ホスト名設定[^2]
   1. sshserverインストール[^2]
@@ -144,9 +158,9 @@
   1. sshserverインストール[^2]
   1. 初期ユーザーにdevelopユーザー追加[^3]
   1. 固定IP設定ファイル編集
-      - 構築用VM側の手順を参照。
+      - 管理用VM側の手順を参照。
   1. netplanコマンドの実行(固定IP設定の適用)
-      - 構築用VM側の手順を参照。
+      - 管理用VM側の手順を参照。
 
 
 ### サーバープロビジョニング／テスト実行方法
@@ -221,7 +235,7 @@
           rake serverspec:cacti01
           ```
         - 期待するserverspec戻り値:テスト内容をクリア出来ない事を表すRed表示。
-          ![参考:green表示](doc/image/serverspec_red.png)
+          ![参考:green表示](image/serverspec_red.png)
     1. ansibleでのサーバー設定の実施
         - ansible実行により、スクリプトに定義されているサーバー設定を実施する。
           ```bash
@@ -230,15 +244,9 @@
           # serverspecの実行コマンドsyntax
           # ansible-playbook -i [イベントリファイル名] -l [実行ロール名] [プロビジョニングファイル名] [オプション]
           # 尚、イベントリファイル名は実行環境をserverspecと共通化する為にサーバーENV化を推奨。
-          # ロールは現在all,cacit(01/02の同時実行),c1(cacti01のみ),c2(cacti02のみ)を想定。
+          # ロールは現在all,cacit[01|02]を想定。
           # ->Option： -C(Dry Runの実行),-v(詳細表示。vの数でより詳細情報を表示) 
-          ansible-playbook -i ${ENVIROMENT}.ini -l cacti deploy.yml -vvv
-          # mariadbインストールのみ、ansible-garaxyより、コミュニティー作成のroleを取得して利用(MITライセンス)。
-          # https://github.com/mahdi22/ansible-mariadb-install
-          # 以下、ansibleディレクトリで上記Roleを導入するコマンドを実行。
-          ansible-galaxy install mahdi22.mariadb_install -p ansible/roles/
-          # タイプ文字列が長いのでリネーム
-          mv mahdi22.ansible-mariadb-install db
+          ansible-playbook -i ${ENVIROMENT}.ini -l cacti01 deploy.yml -vvv
           ```
     1. serverspecの再実行(設定完了を確認)
         - serverspecを実行し、ansibleスクリプト実行後のCacti01/02の状態を確認する。
@@ -251,11 +259,11 @@
           rake serverspec:cacti01
           ```
         - 期待するserverspec戻り値:テスト内容をクリアした事を表すGreen表示。
-          ![参考:green表示](doc/image/serverspec_green.png)
+          ![参考:green表示](image/serverspec_green.png)
 
 #### 補足
 
-[^1]: OS標準バージョンと異なるミドルウェアを導入する為に必要となるaptリポジトリの追加及び、依存関係にあるパッケージを追加。 
-[^2]: インストール時の対話形式入力値。別紙Ubuntu20インストール手順を参照。
+[^1]: OS標準バージョンと異なるミドルウェアを導入する為に必要となるaptリポジトリの追加及び、cacti導入の為の依存関係にあるパッケージを追加。
+[^2]: インストール時の対話形式入力値。別紙「Ubuntu20インストール手順」を参照。
 [^3]: サーバープロビジョニング／テストを実行する為のテンポラリユーザー。セキュリティ観点で最終的に削除を実施。
 

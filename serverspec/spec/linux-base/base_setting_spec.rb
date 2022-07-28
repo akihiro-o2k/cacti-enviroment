@@ -40,6 +40,7 @@ describe "#{TITLE}[3]:/etc/hosts関連設定の確認" do
   end
 end
 
+
 # test /etc/profile.d/prompt_coler.sh
 #describe 'プロンプト色設定シェルの設定確認' do
 #  describe file('/etc/profile.d/prompt_coler.sh') do
