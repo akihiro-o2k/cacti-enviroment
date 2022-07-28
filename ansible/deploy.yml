@@ -9,13 +9,15 @@
   tags:
     - linux-base
 
-- hosts: cacti
+- hosts: cacti01
   vars_files:
     - vars/{{ stage }}.yml
     - vars/common.yml
   roles:
     - httpd
     - db
+    - cacti
   tags:
     - httpd
     - db
+    - cacti

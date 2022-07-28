@@ -4,15 +4,35 @@
 - user_list:
   - { u_name: visualize, groups: 'lxd,sudo', pass: Visualize0033#, shell: /bin/bash, home: /home/visualize }
 
+- native_packages:
+  - snmp
+  - snmpd
+  - rrdtool
+  - libmysql++-dev
+  - libsnmp-dev
+  - help2man
+  - dos2unix
+  - autoconf
+  - dh-autoreconf
+  - libssl-dev
+  - librrds-perl
 - php_packages:
   - php8.1
   - libapache2-mod-php8.1
+  - php8.1-cli
+  - php8.1-snmp
   - php8.1-mysql
-  - php8.1-xml
-  - php8.1-ldap
   - php8.1-mbstring
   - php8.1-gd
+  - php8.1-xml
+  - php8.1-ldap
   - php8.1-gmp
+  - php8.1-intl
+  #- php8.1-recode
+  #- php8.1-gettext
+  #- php8.1-pear
+  - php8.1-pspell
+  - php8.1-memcache
 
 - time_zone: Asia/Tokyo
 
