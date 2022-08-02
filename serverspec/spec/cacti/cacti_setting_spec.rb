@@ -8,3 +8,11 @@ describe "[1]:cacti動作に必要となるnativeパッケージのインスト�
     end
   end
 end
+describe "[2]cactaiのファイル存在確認" do
+  describe file("#{COMMON['cacti_root_path']}") do
+    it { should be_directory }
+    it { should be_mode 640 }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
+  end
+end

@@ -5,3 +5,14 @@
     name:
       "{{ native_packages }}"
 
+- name: download & unzip cacti.tar.gz
+  ansible.builtin.unarchive:
+    src: "{{ cacti_download_url }}"
+    dest: /var/www
+    owner: root
+    group: root
+    mode: 0640
+    remote_src: yes
+
+- name: directory_name chenge
+  command: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
