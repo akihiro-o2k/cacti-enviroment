@@ -16,6 +16,7 @@
   - dh-autoreconf
   - libssl-dev
   - librrds-perl
+  - snmp-mibs-downloader
 - php_packages:
   - php8.1
   - libapache2-mod-php8.1
@@ -53,6 +54,11 @@
 - db_user_password: cactiuser
 # 独自改修箇所:ミラーサイトとバージョンを同一URIで変数渡し
 - mariadb_repo: 'deb https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.8/ubuntu'
+
+# cacti公式サイトより、バージョン指定でtarファイルをDL
+- cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz'
+- cacti_unarchive_path: /var/www/cacti-1.2.21
+- cacti_root_path: /var/www/cacti
 
 # 以下、状況により利用するオプションをコメントアウト
 #- use_proxy: yes
