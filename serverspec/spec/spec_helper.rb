@@ -1,4 +1,3 @@
-require 'highline/import'
 require 'serverspec'
 require 'net/ssh'
 require 'lib/ansible_vars'
