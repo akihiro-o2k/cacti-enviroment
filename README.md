@@ -257,6 +257,8 @@
           # rake serverspec:[target_host]
           # -> [target_host]は/etc/hostsと~develop/.ssh/configで事前設定。
           rake serverspec:cacti01
+          # json形式で出力する場合の例
+          rake serverspec:cacti01 SPEC_OPTS="--format json -o /tmp/result.json"
           ```
         - 期待するserverspec戻り値:テスト内容をクリアした事を表すGreen表示。
           ![参考:green表示](doc/image/serverspec_green.png)

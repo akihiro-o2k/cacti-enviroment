@@ -1,13 +1,12 @@
 require 'spec_helper'
 
-TITLE = '[linux基本設定]-'
 # test Ubuntu version
-describe "#{TITLE}[1]:OS のバージョンは Ubuntu 20.04 であることを確認する" do
+describe "[1]:OS のバージョンは Ubuntu 20.04 であることを確認する" do
   describe command("lsb_release -a") do
     its(:stdout) { should match /Ubuntu 20.04/ }
   end
 end
-describe "#{TITLE}[2]:/etc/profile.d/proxy_setting.shの存在確認" do
+describe "[2]:/etc/profile.d/proxy_setting.shの存在確認" do
   describe file('/etc/profile.d/proxy_setting.sh') do
     if ENV['ENVIROMENT']!='development' then
       it { should be_file }
@@ -23,7 +22,7 @@ describe "#{TITLE}[2]:/etc/profile.d/proxy_setting.shの存在確認" do
 end
 
 # test /etc/hosts
-describe "#{TITLE}[3]:/etc/hosts関連設定の確認" do
+describe "[3]:/etc/hosts関連設定の確認" do
   hosts = %w(cacti01 cacti02 mssql01 mssql02)
   describe file('/etc/hosts') do
     it { should be_file }
@@ -53,14 +52,14 @@ end
 #end
 
 # systemd-timesyncd
-describe "#{TITLE}[4]:NTPD(systemd-timesyncd)の起動と再起動時の動作を確認" do
+describe "[4]:NTPD(systemd-timesyncd)の起動と再起動時の動作を確認" do
   describe service('systemd-timesyncd'), :if => os[:family] == 'ubuntu' do
     it { should be_enabled   }
     it { should be_running   }
   end
 end
 
-describe "#{TITLE}[5]:NTP参照先設定の確認" do
+describe "[5]:NTP参照先設定の確認" do
   ENVIROMENT['ntp_servers'].each do |ntpd|
     describe command("timedatectl timesync-status | grep Server") do
       its(:stdout) { should match /#{ntpd}/ }
@@ -68,7 +67,7 @@ describe "#{TITLE}[5]:NTP参照先設定の確認" do
   end
 end
 
-describe "#{TITLE}[6]:timezone設定値が'#{COMMON['time_zone']}'である事" do
+describe "[6]:timezone設定値が'#{COMMON['time_zone']}'である事" do
   describe command("timedatectl | grep 'Time zone'") do
       its(:stdout) { should match /#{COMMON['time_zone']}/ }
   end
