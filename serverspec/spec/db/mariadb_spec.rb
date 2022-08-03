@@ -35,7 +35,7 @@ end
 =end
 describe "mariadb userの参照可能DB確認" do
   describe "rootユーザーでmysqlshow実行結果:" do
-    grant = %w(cacti information_schema mysql performance_schema sys)
+    grant = %w(cactidb information_schema mysql performance_schema sys)
     describe command("mysqlshow -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']}") do
       grant.each do |param|
         its(:stdout)  { should match /#{param}/ }
@@ -45,13 +45,25 @@ describe "mariadb userの参照可能DB確認" do
 end
 describe "#{COMMON['db_user_name']}ユーザーのmysqlshow実行結果:" do
   describe command("mysqlshow -u#{COMMON['db_user_name']} -p#{COMMON['db_user_password']} -h#{COMMON['bind-address']}") do
-     %w(cacti information_schema).each do |param|
+     %w(cactidb information_schema).each do |param|
       its(:stdout)  { should match /#{param}/ }
     end
   end
 end
-describe 'character_set_serverの確認:' do
+describe 'configracion params check:' do
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep collation_server") do
+    its(:stdout)  { should match /utf8mb4_general_ci/ }
+  end
   describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep character_set_server") do
     its(:stdout)  { should match /utf8mb4/ }
+  end
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep max_heap_table_size") do
+    its(:stdout)  { should match /16777216/ }
+  end
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep tmp_table_size") do
+    its(:stdout)  { should match /16777216/ }
+  end
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep innodb_file_per_table") do
+    its(:stdout)  { should match /ON/ }
   end
 end
