@@ -1,0 +1,6 @@
+Alias /cacti  /var/www/cacti
+<Directory /var/www/cacti/>
+  <IfModule mod_authz_core.c>
+     Require all granted
+  </IfModule>
+</Directory>

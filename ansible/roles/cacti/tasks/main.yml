@@ -15,4 +15,21 @@
     remote_src: yes
 
 - name: directory_name chenge
-  command: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
+  command:
+    cmd: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
+    removes: "{{ cacti_unarchive_path }}"
+
+- name: create a new virtual host file for the Cacti site
+  become: yes
+  template:
+    src: etc/apache2/sites-available/cacti.conf.j2
+    dest: /etc/apache2/sites-available/cacti.conf
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Restart service apache2
+  ansible.builtin.systemd:
+    name: apache2.service
+    state: restarted

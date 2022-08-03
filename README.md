@@ -83,6 +83,8 @@
       sudo mv /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.disabled
       # 新規設定ファイルを01として記述
       sudo cp -p /etc/netplan/00-installer-config.yaml.disabled /etc/netplan/01-installer-config.yaml
+      # viで編集
+      sudo vi /etc/netplan/01-installer-config.yaml
       ```
       ```yaml
       # /etc/netplan/01-installer-config.yamlの記入例

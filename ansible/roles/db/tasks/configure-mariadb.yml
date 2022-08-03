@@ -5,12 +5,19 @@
   notify: restart mariadb server
   when: ( ansible_distribution_file_variety == "RedHat" )
 
+#- name: Make mariadb server file configuration
+#  template:
+#    src: server.cnf.j2
+#    dest: /etc/mysql/mariadb.cnf
+#  notify: restart mariadb server
+#  when: ( ansible_distribution_file_variety == "Debian" )
+
 - name: Make mariadb server file configuration
   template:
-    src: server.cnf.j2
-    dest: /etc/mysql/mariadb.cnf
+    src:  50-server.cnf.j2
+    dest: /etc/mysql/mariadb.conf.d/50-server.cnf
   notify: restart mariadb server
-  when: ( ansible_distribution_file_variety == "Debian" )
+  when: ansible_distribution == 'Ubuntu'
 
 - name: Configure swappiness
   sysctl:
