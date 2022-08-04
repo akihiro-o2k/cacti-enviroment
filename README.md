@@ -237,7 +237,7 @@
           rake serverspec:cacti01
           ```
         - 期待するserverspec戻り値:テスト内容をクリア出来ない事を表すRed表示。
-          ![参考:green表示](doc/image/serverspec_red.png)
+          ![参考:green表示](doc/images/serverspec_red.png)
     1. ansibleでのサーバー設定の実施
         - ansible実行により、スクリプトに定義されているサーバー設定を実施する。
           ```bash
@@ -263,7 +263,7 @@
           rake serverspec:cacti01 SPEC_OPTS="--format json -o /tmp/result.json"
           ```
         - 期待するserverspec戻り値:テスト内容をクリアした事を表すGreen表示。
-          ![参考:green表示](doc/image/serverspec_green.png)
+          ![参考:green表示](doc/images/serverspec_green.png)
 
 #### 補足
 

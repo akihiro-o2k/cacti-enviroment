@@ -20,5 +20,5 @@ proxy_env: []
 mariadb_logrotate:
     rotate: "7"
     rotation: daily
-import_sql_file: False
+import_sql_file: True
 sql_file_name: []

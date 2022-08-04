@@ -67,3 +67,11 @@ describe 'configracion params check:' do
     its(:stdout)  { should match /ON/ }
   end
 end
+describe "sql_batch_01の実行結果確認" do
+  cactidb_tables = YAML.load_file('spec/vars/cactidb_tables.yml')['cactidb_tables']
+  describe command("mysql -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} cactidb -e 'show tables;'") do
+    cactidb_tables.each do |table|
+      its(:stdout)  { should match /#{table}/ }
+    end
+  end
+end
