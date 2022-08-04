@@ -2,6 +2,7 @@ require 'serverspec'
 require 'net/ssh'
 require 'lib/ansible_vars'
 require 'highline/import'
+require 'yaml'
 
 set :backend, :ssh
 
