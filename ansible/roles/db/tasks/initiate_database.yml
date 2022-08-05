@@ -43,7 +43,7 @@
 
 - name: Delete SQL script files
   file:
-    path: /tmp/{{ item }}
+    path: "/tmp/{{ item.file }}"
     state: absent
   with_items: "{{ sql_file_name }}"
   when: "{{ import_sql_file }}"
