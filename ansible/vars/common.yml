@@ -54,9 +54,9 @@
 - innodb_buffer_pool_size: '1G'
 - import_sql_file: true
 - sql_file_name:
-  - 01_criate_cacti_tables.sql
-  - 02_insert_mysql_data_timezone.sql
-  - 03_grant_select_parmission.sql
+  - { db: 'cactidb', file: '01_criate_cacti_tables.sql' }
+  - { db: 'mysql', file: '02_insert_mysql_data_timezone.sql' }
+  - { db: 'mysql ', file: '03_grant_select_parmission.sql' }
 
 # cacti公式サイトより、バージョン指定でtarファイルをDL
 - cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz'

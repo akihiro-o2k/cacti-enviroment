@@ -45,7 +45,7 @@ describe "mariadb userの参照可能DB確認" do
 end
 describe "#{COMMON['db_user_name']}ユーザーのmysqlshow実行結果:" do
   describe command("mysqlshow -u#{COMMON['db_user_name']} -p#{COMMON['db_user_password']} -h#{COMMON['bind-address']}") do
-     %w(cactidb information_schema).each do |param|
+     %w(cactidb information_schema mysql).each do |param|
       its(:stdout)  { should match /#{param}/ }
     end
   end
@@ -69,9 +69,18 @@ describe 'configracion params check:' do
 end
 describe "sql_batch_01の実行結果確認" do
   cactidb_tables = YAML.load_file('spec/vars/cactidb_tables.yml')['cactidb_tables']
-  describe command("mysql -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} cactidb -e 'show tables;'") do
+  describe command("mysql -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} #{COMMON['database']} -e 'show tables;'") do
     cactidb_tables.each do |table|
       its(:stdout)  { should match /#{table}/ }
+    end
+  end
+end
+
+describe "sql_batch_x02の実行結果確認" do
+  time_zone = %w(MET UTC Universal  Europe/Moscow leap/Europe/Moscow Japan)
+  describe command("mysql -u#{COMMON['db_user_name']} -p#{COMMON['db_user_password']} -h#{COMMON['bind-address']} mysql -e 'select * from time_zone_name;'") do
+    time_zone.each do |local|
+      its(:stdout)  { should match /#{local}/ }
     end
   end
 end

@@ -31,9 +31,9 @@
   command:
     cmd: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
     removes: "{{ cacti_unarchive_path }}"
-  when:
-    - d.stat.exists == false
-    - d.stat.isdir == false
+    #  when:
+    #- d.stat.exists == false
+    #- d.stat.isdir == false
 
 - name: unarchive_dir_check
   stat:
