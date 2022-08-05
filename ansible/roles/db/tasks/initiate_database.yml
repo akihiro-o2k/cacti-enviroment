@@ -24,16 +24,16 @@
 
 - name: Copy SQL script files
   copy:
-    src: "{{ item }}"
+    src: "{{ item.file }}"
     dest: /tmp/
   with_items: "{{ sql_file_name }}"
   when: import_sql_file
 
 - name: Import init script to database
   mysql_db:
-    name: "{{ database }}"
+    name: "{{ item.db }}"
     state: import
-    target: "/tmp/{{ item }}"
+    target: "/tmp/{{ item.file }}"
     login_user: root
     login_password: "{{ mysql_root_password }}"
   with_items: "{{ sql_file_name }}"
