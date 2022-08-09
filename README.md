@@ -36,7 +36,7 @@
     - curl
     - wget
     - ppa:ondrej/php
-    - oftware-properties-common
+    - software-properties-common
     - dirmngr
     - snmp
     - snmpd
@@ -49,7 +49,7 @@
     - dh-autoreconf
     - libssl-dev
     - librrds-perl
-
+    - snmp-mibs-downloader
 ## サーバー構成
 ### 基本設計
   - 「構築XXXXXXXXXX」６頁の「基盤構成」に記載の要件に準拠する。
@@ -204,6 +204,7 @@
         │   ├── staging.ini         (検証環境イベントリ)
         │   ├── production.ini      (商用環境イベントリ)
         │   ├── roles               (プロビジョニング実設定格納ディレクトリ)
+        │   │   ├── cacti           (phpコンテンツ-cactiの設定)
         │   │   ├── httpd           (httpd設定)
         │   │   └── linux-base      (os設定)
         │   │   └── db              (mariadb設定)
@@ -213,12 +214,14 @@
         │       └── staging.yml     (検証環境の変数)
         │       └── production.yml  (商用環境の変数)
         ├── doc                     (各種ドキュメント格納ディレクトリ)
-        │   └── documents
+        │   └── images              (ドキュメント用バイナリ格納先)
         ├── README.md               (github見出しファイル)
         └── serverspec            [serverspec実行時のルートディレクトリ]
+            ├── extraction          (ansibleに依存しない静的値格納ディレクトリ)
             ├── Rakefile            (serverspec全体設定)
             ├── lib                 (独自ライブラリ格納ディレクトリ)
             └── spec                (テストコード格納ディレクトリ)
+                ├── cacti           (phpコンテンツ-cactiのテスト)
                 ├── db              (mariadbテスト)
                 ├── httpd           (httpdテスト)
                 ├── linux-base      (osテスト)

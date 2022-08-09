@@ -14,10 +14,10 @@
     - vars/{{ stage }}.yml
     - vars/common.yml
   roles:
-    - httpd
-    - db
+    #- httpd
+    #- db
     - cacti
   tags:
-    - httpd
-    - db
+    #- httpd
+    #- db
     - cacti

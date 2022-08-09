@@ -12,7 +12,7 @@
     dest: /var/www
     owner: www-data 
     group: www-data
-    mode: 0640
+    mode: 0755
     remote_src: yes
 
 - name: directory check
@@ -57,8 +57,21 @@
     group: root
     mode: 0644
 
+- name: create symbleic_link cacti.conf
+  command:
+    cmd: "ln -s /etc/apache2/sites-available/cacti.conf /etc/apache2/sites-enabled/cacti.conf"
+
 - name: Restart service apache2
   ansible.builtin.systemd:
     name: apache2.service
     state: restarted
 
+- name: create cacti config.php
+  become: yes
+  template:
+    src: var/www/cacti/include/config.php.j2
+    dest: /var/www/cacti/include/config.php
+    backup: true
+    owner: www-data
+    group: www-data
+    mode: 0755

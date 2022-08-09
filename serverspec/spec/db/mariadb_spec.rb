@@ -22,17 +22,6 @@ describe 'mariadb用ポート有効化判定' do
     it { should be_listening.on('127.0.0.1').with('tcp') }
   end
 end
-=begin
-describe 'MySQL config parameters' do
-  context mysql_config('innodb-buffer-pool-size') do
-    its(:value) { should > 10000 }
-  end
-
-  context mysql_config('socket') do
-    its(:value) { should eq '/tmp/mysql.sock' }
-  end
-end
-=end
 describe "mariadb userの参照可能DB確認" do
   describe "rootユーザーでmysqlshow実行結果:" do
     grant = %w(cactidb information_schema mysql performance_schema sys)
@@ -67,8 +56,8 @@ describe 'configracion params check:' do
     its(:stdout)  { should match /ON/ }
   end
 end
-describe "sql_batch_01の実行結果確認" do
-  cactidb_tables = YAML.load_file('spec/vars/cactidb_tables.yml')['cactidb_tables']
+describe "sql_batch_01の実行結果確認(show tables結果を文字列合致で確認)" do
+  cactidb_tables = YAML.load_file('extraction/cactidb_tables.yml')['cactidb_tables']
   describe command("mysql -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} #{COMMON['database']} -e 'show tables;'") do
     cactidb_tables.each do |table|
       its(:stdout)  { should match /#{table}/ }
@@ -76,11 +65,34 @@ describe "sql_batch_01の実行結果確認" do
   end
 end
 
-describe "sql_batch_x02の実行結果確認" do
+describe "sql_batch_x02の実行結果確認(insert結果をユニーク値合致で確認)" do
+  # time_zoneテーブルのユニーク値が全て取得できるか確認。
   time_zone = %w(MET UTC Universal  Europe/Moscow leap/Europe/Moscow Japan)
-  describe command("mysql -u#{COMMON['db_user_name']} -p#{COMMON['db_user_password']} -h#{COMMON['bind-address']} mysql -e 'select * from time_zone_name;'") do
+  describe command("mysql -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} mysql -e 'select * from time_zone_name;'") do
     time_zone.each do |local|
       its(:stdout)  { should match /#{local}/ }
+    end
+  end
+  actual = %w(1N 2N 3N 4Y 5N)
+  describe command("mysql -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} mysql -e 'select concat(Time_zone_id, Use_leap_seconds) val from mysql.time_zone;'") do
+    actual.each do |val|
+      its(:stdout)  { should match /#{val}/ }
+    end
+  end
+  # time_zone_transition_typeのテーブルでユニークになる文字列にconcatして全レコードが存在するか確認。
+  time_zone_transition_type=YAML.load_file('extraction/cactidb_tables.yml')['time_zone_transition_type']
+  sql = "select distinct concat(Time_zone_id, '-', Transition_type_id,'-',Abbreviation) zones from time_zone_transition_type;"
+  describe command("mysql -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} mysql -e \"#{sql}\"") do
+    time_zone_transition_type.each do |value|
+      its(:stdout)  { should match /#{value}/ }
+    end
+  end
+  # time_zone_transitionテーブルでユニークとなる文字列にconcatして全レコードが存在するか確認。
+  time_zone_transition=YAML.load_file('extraction/time_zone_transition.yml')['time_zone_transition']
+  sql = "select distinct concat(Time_zone_id,':',Transition_time) uniq from time_zone_transition;"
+  describe command("mysql -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} mysql -e \"#{sql}\"") do
+    time_zone_transition.each do |value|
+      its(:stdout)  { should match /#{value}/ }
     end
   end
 end

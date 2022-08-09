@@ -110,3 +110,36 @@ cactidb_tables:
   - vdef
   - vdef_items
   - version
+
+time_zone_transition_type:
+  - 1-0-MEST
+  - 1-1-MET
+  - 1-2-MEST
+  - 1-3-MET
+  - 2-0-UTC
+  - 3-0-MMT
+  - 3-1-MST
+  - 3-2-MMT
+  - 3-3-MDST
+  - 3-4-MSK
+  - 3-5-MSD
+  - 3-6-MSD
+  - 3-7-EET
+  - 3-8-MSK
+  - 3-9-MSD
+  - 3-10-EEST
+  - 3-11-EET
+  - 4-0-MMT
+  - 4-1-MST
+  - 4-2-MMT
+  - 4-3-MDST
+  - 4-4-MSK
+  - 4-5-MSD
+  - 4-6-MSD
+  - 4-7-EET
+  - 4-8-MSK
+  - 4-9-MSD
+  - 4-10-EEST
+  - 4-11-EET
+  - 5-0-CJT
+  - 5-1-JST
