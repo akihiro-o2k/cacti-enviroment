@@ -39,7 +39,7 @@
 - php_max_execution_time: 300
 - php_memory_limit: 256M
 
-# ansible-galaxy install mahdi22.mariadb_install 
+# ansible-galaxy mahdi22.mariadb_installのパラメータ
 - mariadb_version: "10.8"
 - bind-address: '127.0.0.1'
 - deny_remote_connections: true
@@ -62,14 +62,3 @@
 - cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz'
 - cacti_unarchive_path: /var/www/cacti-1.2.21
 - cacti_root_path: /var/www/cacti
-
-# 以下、状況により利用するオプションをコメントアウト
-#- use_proxy: yes
-#  proxy_env:
-#      http_proxy: http://proxy.local:8080/
-#      https_proxy: http://proxy.local:8080/
-#- import_sql_file: true
-#    sql_file_name:
-#      - sqlscript1.sql
-#      - sqlscript2.sql
-#      - sqlscriptN.sql

@@ -141,11 +141,3 @@
           with_items: "{{ sql_file_name }}"
           when: "{{ import_sql_file }}"
         ```
-      - 参考:連想配列`import_sql_file`はvar/common.ymlで下記の様に定義。
-        ```yaml
-        - sql_file_name:
-          - { db: 'cactidb', file: '01_criate_cacti_tables.sql' }
-          - { db: 'mysql', file: '02_insert_mysql_data_timezone.sql' }
-          - { db: 'mysql ', file: '03_grant_select_parmission.sql' }
-        ```  
-
