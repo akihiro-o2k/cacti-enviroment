@@ -304,32 +304,7 @@
 - 出力結果
   - JSON形式に出力したserverspec実行結果のサンプルと、jsonフォーマット定義を以下に示す。
     - コマンド実行結果サンプル
-      ```json
-      {
-        "version": "3.8.0",
-        "examples": [
-          {
-            "id": "./spec/hoge/main_spec.rb[1:1:1:1]",
-            "description": "should be enabled",
-            "full_description": "sshdサービス が有効であること Service \"sshd\" should be enabled",
-            "status": "passed",
-            "file_path": "./spec/hoge/main_spec.rb",
-            "line_number": 6,
-            "run_time": 1.606149747,
-            "pending_message": null
-          },
-          {"(２個目のテスト)"},
-          ],
-          "summary": {
-            "duration": 1.688882982,
-            "example_count": 2,
-            "failure_count": 0,
-            "pending_count": 0,
-            "errors_outside_of_examples_count": 0
-          },
-          "summary_line": "2 examples, 0 failures"
-        }
-      ```
+      ![画像:csv出力ファイルをExcelで表示](doc/images/format_json.png)
     - jsonフォーマット定義
       - version:
         - テスト実行エンジンrspecのバージョン
@@ -361,7 +336,7 @@
         - example_countとfailuer_countを文字列で格納。 納品段階ではexample_count数とエラー0件で合格となる。
 
 
-#### serverspec実行結果のCSV出力
+#### CSV出力ファイル
 - 目的
   - JSON出力結果のみでは目視確認に難がある為、JSON出力した結果をjsonパーサー`jq`コマンドを介して、feild指定でCSV変換した物を合わせて納品する。
 - 実現方法
