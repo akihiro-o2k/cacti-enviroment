@@ -3,9 +3,14 @@ require 'spec_helper'
 # 定数定義
 PHP_INI = { :ini => COMMON['php_ini_path'] }.freeze
 
-describe 'apache2.4パッケージがインストールされている事。' do
+describe 'apache2パッケージがインストールされている事。' do
   describe package('apache2'), :if => os[:family] == 'ubuntu' do
     it { should be_installed }
+  end
+end
+describe "標準催促別紙要件:インストールしたApacheのバージョンが2.4系であること" do
+  describe command("/usr/sbin/apache2ctl -v") do
+    its(:stdout)  { should match /^Server version: Apache\/2.4.*/ }
   end
 end
 
@@ -32,15 +37,11 @@ describe "/etc/apache2/apache2.confの設定内容を正規表現フックで確
     it { should be_grouped_into 'root' }
     # 独自設定箇所
     its(:content) { should match /#{accept}/ }
+    # TODO:業務要件の妥当性確認(ErrorLogの出力無効化の方式の良否判定)
     its(:content) { should match /ErrorLog \/dev\/null/ }
   end
 end
 
-describe "インストール済みApacheバージョンが2.4系であること" do
-  describe command("/usr/sbin/apache2ctl -v") do
-    its(:stdout)  { should match /^Server version: Apache\/2.4.*/ }
-  end
-end
 
 describe "/etc/apache2/sites-available/000-default.confの設定内容を正規表現フックで確認" do
   describe file('/etc/apache2/sites-available/000-default.conf') do
@@ -70,6 +71,7 @@ describe 'PHP_config関連のテスト' do
     # TODO:max_execution_timeパラメータのみphp_config用テストメソッドでフック出来なかった為正規表件で確認。
     its(:content) { should match /max_execution_time = #{COMMON['php_max_execution_time']}/ }
   end
+  # TODO:各種PHP設定パラメータの妥当性確認及び、不足があれば外部パラメータ化してserverspec/ansibleへ反映。
   context  php_config('memory_limit', PHP_INI) do
     its(:value) { should eq COMMON['php_memory_limit'] }
   end

@@ -20,7 +20,7 @@
     - ruby 2.7.0p0 (2019-12-25 revision 647ee6f091) [x86_64-linux-gnu]
     - rake, version 13.0.6
 - 特記事項
-  - 動作環境(サーバープロビジョニング及び、サーバーテスト方式)の各種アプリケーションプラットフォームは要件を充足する上で便宜的に構築する副産物である為、「[設計へのインプットとなる要件及び関連文書仕様](#設計へのインプットとなる要件及び関連文書仕様)」で求められる技術標準化リストのバージョンを考慮せず、OS安定版として提供するバージョンの物を使用する。
+  - 動作環境(サーバープロビジョニング及び、サーバーテスト方式)の各種アプリケーションプラットフォームは要件を充足する上で便宜的に構築する副産物である為、「設計へのインプットとなる要件及び関連文書・仕様」で求められる技術標準化リストのバージョンを考慮せず、OS安定版として提供するバージョンの物を使用する。
   - 上記のサーバープロビジョニング／テスト動作環境を便宜的に「管理用VM」と定義し当該文書上に記載する。
 
 ### ミドルウェア
@@ -30,13 +30,23 @@
     1. Apache(2.4.x)
     1. php(8.1)
     1. mariadb(10.8)
-  - その他、上記パッケージ導入に付随して導入するパッケージ[^1]
-    - traceroute
-    - build-essential
-    - curl
-    - wget
+  - 特記事項
+    - php8.1で構築を進めているが、php7から8へメジャーバージョンアップに際して廃止となった関連パッケージ及びメソッドがある為、cactiの動作結果に問題が生じる際は協議の上でphp7.4へのダウングレードを行うものとする。
+#### アプリケーション
+  - 「[設計へのインプットとなる要件及び関連文書仕様](#設計へのインプットとなる要件及び関連文書仕様)」で定義されたお客様指定のアプリケーションを導入する。
+  - 導入アプリケーション
+    1. cacti(1.2.21)
+
+  - 特記事項
+    - アプリケーションはUbuntu公式が提供するaptリポジトリのバージョンが古い為、公式サイトが提供する最新版を使用する。
+      ```bash
+      # syntax
+      wget https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz
+      ```
+    - 上記、cactiのバージョンは構築の方式検討開始時点でcactiの公式サイトで最新の安定版パッケージを選定したが、導入検証作業内において動作の不具合等が確認された場合はお客様と協議の上、バージョンダウン等を行い安定稼働するバージョンで納品を行う。
+  - 上記アプリケーション導入に付随して導入するネイティブパッケージ[^1]
     - ppa:ondrej/php
-    - software-properties-common
+    - oftware-properties-common
     - dirmngr
     - snmp
     - snmpd
@@ -49,7 +59,13 @@
     - dh-autoreconf
     - libssl-dev
     - librrds-perl
-    - snmp-mibs-downloader
+  - その他、動作検証及び不具合時の切り分け等を目的として追加するネイティブパッケージ
+    - traceroute
+    - build-essential
+    - curl
+    - wget
+
+
 ## サーバー構成
 ### 基本設計
   - 「構築XXXXXXXXXX」６頁の「基盤構成」に記載の要件に準拠する。
@@ -204,8 +220,8 @@
         │   ├── staging.ini         (検証環境イベントリ)
         │   ├── production.ini      (商用環境イベントリ)
         │   ├── roles               (プロビジョニング実設定格納ディレクトリ)
-        │   │   ├── cacti           (phpコンテンツ-cactiの設定)
         │   │   ├── httpd           (httpd設定)
+        │   │   ├── cacti           (cacti設定)
         │   │   └── linux-base      (os設定)
         │   │   └── db              (mariadb設定)
         │   └── vars                (変数定義ディレクトリ)
@@ -214,16 +230,15 @@
         │       └── staging.yml     (検証環境の変数)
         │       └── production.yml  (商用環境の変数)
         ├── doc                     (各種ドキュメント格納ディレクトリ)
-        │   └── images              (ドキュメント用バイナリ格納先)
+        │   └── documents
         ├── README.md               (github見出しファイル)
         └── serverspec            [serverspec実行時のルートディレクトリ]
-            ├── extraction          (ansibleに依存しない静的値格納ディレクトリ)
             ├── Rakefile            (serverspec全体設定)
             ├── lib                 (独自ライブラリ格納ディレクトリ)
             └── spec                (テストコード格納ディレクトリ)
-                ├── cacti           (phpコンテンツ-cactiのテスト)
                 ├── db              (mariadbテスト)
                 ├── httpd           (httpdテスト)
+                ├── cacti           (cactiテスト)
                 ├── linux-base      (osテスト)
                 ├── spec_helper.rb  (テストコード共通設定)
                 └── vars            (../../ansible/vars/へのシンボリックリンク)
@@ -262,15 +277,112 @@
           # rake serverspec:[target_host]
           # -> [target_host]は/etc/hostsと~develop/.ssh/configで事前設定。
           rake serverspec:cacti01
-          # json形式で出力する場合の例
-          rake serverspec:cacti01 SPEC_OPTS="--format json -o /tmp/result.json"
           ```
         - 期待するserverspec戻り値:テスト内容をクリアした事を表すGreen表示。
           ![参考:green表示](doc/images/serverspec_green.png)
 
+## 成果物
+
+- serverspecのテスト実施結果を以下のファイルに出力し、成果物として提出する。
+  1. json形式ファイル出力。
+      - テスト実施結果の合否と、テスト実行結果が確認できる詳細情報として提出する。
+  1. csv形式ファイル出力。
+      - 上記、json形式ファイルを人間系で俯瞰して確認する為の一覧表としてcsvに変換した物を提出する。
+
+
+#### JSON出力ファイル
+- 目的
+  - 標準リダイレクトでテキスト出力した結果はplain/textとなってしまう性質上、コンソール上でred/greenの表示が行われるテスト成否の配色を出力できない為、テスト毎の実施結果を文字列(statusの値)で成否判定行える形で納品する為の出力。
+  - その他、serverspecの実行内容の詳細が確認できる
+- 実現方法
+  - JSONファイル出力実行コマンド
+      ```bash
+      cd serverspec
+      # json形式で出力する場合の例
+      rake serverspec:cacti01 SPEC_OPTS="--format json -o /tmp/result.json"
+      ```
+- 出力結果
+  - JSON形式に出力したserverspec実行結果のサンプルと、jsonフォーマット定義を以下に示す。
+    - コマンド実行結果サンプル
+      ```json
+      {
+        "version": "3.8.0",
+        "examples": [
+          {
+            "id": "./spec/hoge/main_spec.rb[1:1:1:1]",
+            "description": "should be enabled",
+            "full_description": "sshdサービス が有効であること Service \"sshd\" should be enabled",
+            "status": "passed",
+            "file_path": "./spec/hoge/main_spec.rb",
+            "line_number": 6,
+            "run_time": 1.606149747,
+            "pending_message": null
+          },
+          {"(２個目のテスト)"},
+          ],
+          "summary": {
+            "duration": 1.688882982,
+            "example_count": 2,
+            "failure_count": 0,
+            "pending_count": 0,
+            "errors_outside_of_examples_count": 0
+          },
+          "summary_line": "2 examples, 0 failures"
+        }
+      ```
+    - jsonフォーマット定義
+      - version:
+        - テスト実行エンジンrspecのバージョン
+      - examples配列
+        - example[^4]の実行結果が連想配列形式で格納される。以下、連想配列のkey名称と値の定義。
+          - id:
+            - 対象exampleを記載したファイル名及び、serverspec実行時の実行順位
+          - description:
+            - exampleの判定式。
+          - full_description:
+            - serverspecブロック内のdescribe/context節で指定したテキストと、descriptionで記載した判定式を文字列結合した値。
+          - status: 
+            - 判定式の実施結果。
+          - file_path: 
+            - serverspec実行ルートディレクトリから見た実行ファイルの相対パス。
+          - line_number:
+            - ファイル内でexampleが記載されている行番号
+      - summary:
+        - 実施結果集計地を連想配列で格納。
+          - example_count:
+            - 実行したexample[^4]の合計。
+          - failure_count:
+            - failureとなったexampleの合計。納品段階では0件で合格となる。
+          - pending_count:
+            - テスト実行時にpendingが指定され無効化されたexampleの合計。納品段階では0件で合格となる。
+          - errors_outside_of_examples_count:
+            - 例外エラーが発生したexampleの合計。納品段階では0件で合格となる。
+      - summary_line:
+        - example_countとfailuer_countを文字列で格納。 納品段階ではexample_count数とエラー0件で合格となる。
+
+
+#### serverspec実行結果のCSV出力
+- 目的
+  - JSON出力結果のみでは目視確認に難がある為、JSON出力した結果をjsonパーサー`jq`コマンドを介して、feild指定でCSV変換した物を合わせて納品する。
+- 実現方法
+  - 実行コマンド
+      ```bash
+      # 先行してheaderを対象ファイルに書き出し。
+      echo "id,status,full_description">/tmp/result.csv
+      # jqコマンドを介したcsvファイルに>>でappend出力(exapmlesをfeild指定でcsv化)
+      cat /tmp/result.json | jq '.examples' | jq -r '.[] | [.id, .status, .full_description] | @csv' >> /tmp/result.csv
+      ```
+
+  - csvフォーマット定義
+    - idで対象のexampleを判定(詳細確認はjson出力結果側をidの文字列検索で指定しファイル位置等を確認)、statusでテストの実施結果確認、full_descriptionでテスト実施内容を確認を可能とする。
+    - 人間系で目視確認する為のファイルである為、詳細情報はJSON側を見る想定での出力であるが、JSONフォーマットで定義された各種値を出力することは可能(要相談)。
+
+      - 参考:csv出力ファイルのサンプル。
+      ![画像:csv出力ファイルをExcelで表示](doc/images/resut.png)
 #### 補足
 
 [^1]: OS標準バージョンと異なるミドルウェアを導入する為に必要となるaptリポジトリの追加及び、cacti導入の為の依存関係にあるパッケージを追加。
 [^2]: インストール時の対話形式入力値。別紙「Ubuntu20インストール手順」を参照。
 [^3]: サーバープロビジョニング／テストを実行する為のテンポラリユーザー。セキュリティ観点で最終的に削除を実施。
+[^4]: serverspec(rspec)の用語で単一の`テスト`を指す文言。10件のテストを実施する場合は10examples(複数形)となる。
 
