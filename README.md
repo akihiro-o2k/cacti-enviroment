@@ -20,7 +20,8 @@
     - ruby 2.7.0p0 (2019-12-25 revision 647ee6f091) [x86_64-linux-gnu]
     - rake, version 13.0.6
 - 特記事項
-  - 動作環境(サーバープロビジョニング及び、サーバーテスト方式)の各種アプリケーションプラットフォームは要件を充足する上で便宜的に構築する副産物である為、「設計へのインプットとなる要件及び関連文書・仕様」で求められる技術標準化リストのバージョンを考慮せず、OS安定版として提供するバージョンの物を使用する。
+  - 動作環境(サーバープロビジョニング及び、サーバーテスト方式)の各種アプリケーションプラットフォームは要件を充足する上で便宜的に構築する副産物である為、「[設計へのインプットとなる要件及び関連文書仕様](#設計へのインプットとなる要件及び
+関連文書仕様)」で求められる技術標準化リストのバージョンを考慮せず、OS安定版として提供するバージョンの物を使用する。
   - 上記のサーバープロビジョニング／テスト動作環境を便宜的に「管理用VM」と定義し当該文書上に記載する。
 
 ### ミドルウェア
@@ -46,7 +47,7 @@
     - 上記、cactiのバージョンは構築の方式検討開始時点でcactiの公式サイトで最新の安定版パッケージを選定したが、導入検証作業内において動作の不具合等が確認された場合はお客様と協議の上、バージョンダウン等を行い安定稼働するバージョンで納品を行う。
   - 上記アプリケーション導入に付随して導入するネイティブパッケージ[^1]
     - ppa:ondrej/php
-    - oftware-properties-common
+    - software-properties-common
     - dirmngr
     - snmp
     - snmpd
@@ -59,7 +60,8 @@
     - dh-autoreconf
     - libssl-dev
     - librrds-perl
-  - その他、動作検証及び不具合時の切り分け等を目的として追加するネイティブパッケージ
+    - snmp-mibs-downloader
+  - その他、動作検証及び不具合時の切り分け,納品物のファイル操作等を目的として追加するネイティブパッケージ
     - traceroute
     - build-essential
     - curl
@@ -220,6 +222,7 @@
         │   ├── staging.ini         (検証環境イベントリ)
         │   ├── production.ini      (商用環境イベントリ)
         │   ├── roles               (プロビジョニング実設定格納ディレクトリ)
+        │   │   ├── cacti           (phpコンテンツ-cactiの設定)
         │   │   ├── httpd           (httpd設定)
         │   │   ├── cacti           (cacti設定)
         │   │   └── linux-base      (os設定)
@@ -229,13 +232,15 @@
         │       ├── development.yml (開発環境の変数)
         │       └── staging.yml     (検証環境の変数)
         │       └── production.yml  (商用環境の変数)
-        ├── doc                     (各種ドキュメント格納ディレクトリ)
-        │   └── documents
+        ├── doc                   [各種ドキュメント格納ディレクトリ]
+        │   └── images              (ドキュメント用バイナリ格納先)
         ├── README.md               (github見出しファイル)
         └── serverspec            [serverspec実行時のルートディレクトリ]
+            ├── extraction          (ansibleに依存しない静的値格納ディレクトリ)
             ├── Rakefile            (serverspec全体設定)
             ├── lib                 (独自ライブラリ格納ディレクトリ)
             └── spec                (テストコード格納ディレクトリ)
+                ├── cacti           (phpコンテンツ-cactiのテスト)
                 ├── db              (mariadbテスト)
                 ├── httpd           (httpdテスト)
                 ├── cacti           (cactiテスト)
@@ -265,7 +270,7 @@
           # ansible-playbook -i [イベントリファイル名] -l [実行ロール名] [プロビジョニングファイル名] [オプション]
           # 尚、イベントリファイル名は実行環境をserverspecと共通化する為にサーバーENV化を推奨。
           # ロールは現在all,cacit[01|02]を想定。
-          # ->Option： -C(Dry Runの実行),-v(詳細表示。vの数でより詳細情報を表示) 
+          # ->Option： -C(Dry Runの実行),-v(詳細表示。vの数でより詳細情報を表示)
           ansible-playbook -i ${ENVIROMENT}.ini -l cacti01 deploy.yml -vvv
           ```
     1. serverspecの再実行(設定完了を確認)
@@ -283,7 +288,7 @@
 
 ## 成果物
 
-- serverspecのテスト実施結果を以下のファイルに出力し、成果物として提出する。
+- cacti動作環境構築の試験項目(構築の要件)及び、試験実施結果(要件の充足)としてserverspec実行結果をファイル出力し成果物とする。
   1. json形式ファイル出力。
       - テスト実施結果の合否と、テスト実行結果が確認できる詳細情報として提出する。
   1. csv形式ファイル出力。
@@ -316,9 +321,9 @@
             - exampleの判定式。
           - full_description:
             - serverspecブロック内のdescribe/context節で指定したテキストと、descriptionで記載した判定式を文字列結合した値。
-          - status: 
+          - status:
             - 判定式の実施結果。
-          - file_path: 
+          - file_path:
             - serverspec実行ルートディレクトリから見た実行ファイルの相対パス。
           - line_number:
             - ファイル内でexampleが記載されている行番号
@@ -336,7 +341,7 @@
         - example_countとfailuer_countを文字列で格納。 納品段階ではexample_count数とエラー0件で合格となる。
 
 
-#### CSV出力ファイル
+#### serverspec実行結果のCSV出力
 - 目的
   - JSON出力結果のみでは目視確認に難がある為、JSON出力した結果をjsonパーサー`jq`コマンドを介して、feild指定でCSV変換した物を合わせて納品する。
 - 実現方法
