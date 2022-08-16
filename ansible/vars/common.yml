@@ -17,6 +17,7 @@
   - libssl-dev
   - librrds-perl
   - snmp-mibs-downloader
+  - software-properties-common
 - php_packages:
   - php8.1
   - libapache2-mod-php8.1
@@ -50,7 +51,12 @@
 - db_user_name: cactiuser
 - db_user_password: cactiuser
 # 独自改修箇所:ミラーサイトとバージョンを同一URIで変数渡し
-- mariadb_repo: 'deb https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.8/ubuntu'
+#
+# 2022.08.16 国内ミラーサイト山形大学からUbuntu20.04向けのmariadb10.8が消失した為、既存のansibleが以下のエラーでスタック。
+# ->ERROR-msg: "Failed to update apt cache: E:The repository 'https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.8/ubuntu focal Release' does not have a Release file."
+# 上述の事象を避ける為、ファイルが存在するUSのミラーサイトを際指定するが、再発した際はmariadb公式サイトでファイルが存在するミラーを検索してmariadb_repoを書き換えが必要となる。
+# mariadb公式サイト(ミラーサイト検索):https://mariadb.org/download/?t=repo-config&d=20.04+%22focal%22&v=10.8&r_m=knownhost
+- mariadb_repo: 'deb https://atl.mirrors.knownhost.com/mariadb/repo/10.8/ubuntu'
 - innodb_buffer_pool_size: '1G'
 - import_sql_file: true
 - sql_file_name:
