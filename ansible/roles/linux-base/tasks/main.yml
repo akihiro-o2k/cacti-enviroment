@@ -51,7 +51,8 @@
       - build-essential
       - curl
       - wget
-
+      - software-properties-common
+      - apt-transport-https
 # provisoning /etc/hosts
 - name: update /etc/hosts
   become: yes
