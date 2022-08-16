@@ -27,7 +27,8 @@
     - db_user_name: cactiuser
     - db_user_password: cactiuser
     # 独自改修箇所:ミラーサイトとバージョンを同一URIで変数渡し
-    - mariadb_repo: 'deb https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.8/ubuntu'
+    #
+    - mariadb_repo: 'deb https://atl.mirrors.knownhost.com/mariadb/repo/10.8/ubuntu'
     - innodb_buffer_pool_size: '1G'
     - import_sql_file: true
     - sql_file_name:
@@ -36,6 +37,15 @@
       - { db: 'mysql ', file: '03_grant_select_parmission.sql' }
 
     ```
+#### mariadbミラーサイトに関する諸注意
+- 2022.08.16にansibleを実行した際にansibleのmariadbリポジトリ追加処理が下記エラーメッセージを出力してスタックした。
+  `"Failed to update apt cache: E:The repository 'https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.8/ubuntu focal Release' does not have a Release file."`
+- 原因
+  - 山形大学のミラーサイト上からUbuntu20.4向けのmariadb10.8パッケージが消去されていた。
+- 対象方法
+  - 上記エラーメッセージが出力されてansibleがスタックした場合は、mariadb公式の[リポジトリ検索ページ](https://mariadb.org/download/?t=repo-config&d=20.04+%22focal%22&v=10.8&r_m=knownhost)で、
+    取得可能なミラーサイトを再検索し、ansible/vars/common.ymlのmariadb_repoパラメータをアクティブなミラーサイトに書き換える。
+
 ### 独自改修箇所
 1. roles/db/vars/Ubuntu.yml
     - 変更の概要
