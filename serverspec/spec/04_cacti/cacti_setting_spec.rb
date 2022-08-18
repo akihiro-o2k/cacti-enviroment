@@ -22,10 +22,8 @@ describe "[3]apache2 virtualhost 設定ファイルの確認::" do
     it { should be_mode 644 }
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
-    describe 'virtualhost設定記載内容を正規表現マッチで確認' do
-      its(:content) { should match /Alias \/cacti/ }
-      its(:content) { should match /Directory\ \/var\/www\/cacti/ }
-    end
+    its(:content) { should match /Alias \/cacti/ }
+    its(:content) { should match /Directory\ \/var\/www\/cacti/ }
   end
 end
 describe "[4]apache2 virtual host link-file設定確認::" do
@@ -41,8 +39,8 @@ describe "[5]/var/www/cacti/include/config.php(mariadb接続設定ファイル)�
     it { should be_mode 755 }
     it { should be_owned_by 'www-data' }
     it { should be_grouped_into 'www-data' }
-    describe "ファイルの値(変数部分)内容が正規表現マッチする事のテスト" do
-      actuals.each { |param| its(:content) { should match /^\$#{param}/ } }
+    actuals.each do |param| 
+      its(:content) { should match /^\$#{param}/ }
     end
   end
 end

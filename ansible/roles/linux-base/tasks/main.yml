@@ -101,6 +101,31 @@
   timezone:
     name: "{{ time_zone }}"
 
+
+- name: add user
+  user:
+    name: "{{ item.u_name }}"
+    groups: "{{ item.groups }}"
+    password: "{{ item.pass | password_hash('sha512') }}"
+    shell: "{{ item.shell }}"
+    home: "{{ item.home }}"
+    state: present
+  with_items: "{{ admin_user }}"
+
+- name: mkdir visualize user home directory
+  ansible.builtin.file:
+    path: "{{ item.home }}"
+    state: directory
+    owner: "{{ item.u_name }}"
+    group: "{{ item.u_name }}"
+    mode: '0755'
+  with_items: "{{ admin_user }}"
+
+- name: root passwd change
+  user:
+    name: root
+    password:  "{{ root_passwd | password_hash('sha512') }}"
+
 #- name: specify DNS
 #  lineinfile:
 #    state: present
