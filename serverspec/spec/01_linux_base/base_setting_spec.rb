@@ -22,15 +22,15 @@ describe "[2]:/etc/profile.d/proxy_setting.shの存在確認::" do
 end
 
 # test /etc/hosts
-describe "[3]:/etc/hosts関連設定の確認::" do
+describe "[3]:/etc/hosts関連設定の確認" do
   hosts = %w(cacti01 cacti02 mssql01 mssql02)
   describe file('/etc/hosts') do
     it { should be_file }
-    describe '名前解決用に各種サーバー名が定義されている事。' do
+    describe '名前解決用に各種サーバー名が定義されている事::' do
       hosts.each { |host| it { should contain host } }
     end
   end
-  describe "/etc/hostsの定義が本当に名前解決できているか確認" do
+  describe "/etc/hostsの定義が名前解決できているか確認::" do
     hosts.each do |tgt|
       describe host(tgt) do
         it { should be_resolvable }
@@ -75,4 +75,25 @@ end
 
 describe "[7]EDRサーバとの連携が正常にできること::" do
   pending
+end
+
+
+user = COMMON['admin_user'][0]
+describe "[8]OS管理用ユーザー'#{user['u_name']}'の設定確認::" do
+  describe user("#{user['u_name']}") do
+    it { should exist }
+    it { should belong_to_primary_group "#{user['u_name']}" }
+    it { should belong_to_group 'sudo' }
+    it { should have_home_directory "#{user['home']}" }
+    it { should have_login_shell "#{user['shell']}" }
+  end
+end
+
+describe "[9]OS管理用ユーザー'#{user['u_name']}'のhome directory設定確認::" do
+  describe file("#{user['home']}") do
+    it { should be_directory }
+    it { should be_owned_by "#{user['u_name']}" }
+    it { should be_grouped_into "#{user['u_name']}" }
+    it { should be_mode 755 }
+  end
 end
