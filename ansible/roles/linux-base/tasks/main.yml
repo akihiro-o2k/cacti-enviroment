@@ -63,17 +63,6 @@
     group: root
     mode: 0644
 
-# provisoning /etc/profile.d/prompt_color.sh
-- name: create /etc/profile.d/prompt_color.sh
-  become: yes
-  template:
-    src: etc/profile.d/prompt-color.sh.j2
-    dest: /etc/profile.d/prompt_coler.sh
-    backup: true 
-    owner: root
-    group: root
-    mode: 0644
-
 - name: create /etc/systemd/timesyncd.conf
   become: yes
   template:
@@ -119,6 +108,18 @@
     owner: "{{ item.u_name }}"
     group: "{{ item.u_name }}"
     mode: '0755'
+  with_items: "{{ admin_user }}"
+
+
+- name: create visualize user .bashrc
+  become: yes
+  template:
+    src: home/develop/.bashrc.j2
+    dest: "{{ item.home }}/.bashrc"
+    backup: true 
+    owner: "{{ item.u_name }}"
+    group: "{{ item.u_name }}"
+    mode: 0664
   with_items: "{{ admin_user }}"
 
 - name: root passwd change

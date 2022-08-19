@@ -8,9 +8,7 @@
    - "172.16.234.136  mssql02"
    # 136はHAプロキシ想定
 
-- prompt:
-  # develop(31->red)
-  - \[\e[1;31m\][\u@\h \W]\\$ \[\e[m\]
+- prompt: 31
 
 
 - ntp_servers:
