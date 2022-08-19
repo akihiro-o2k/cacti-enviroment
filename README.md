@@ -340,7 +340,7 @@
           - full_description:
             - serverspecブロック内のdescribe/context節で指定したテキストと、descriptionで記載した判定式を文字列結合した値。
           - status:
-            - 判定式の実施結果を次の文字列で戻す。(passed->成功, failed->失敗)
+            - 判定式の実施結果を次の文字列で戻す。(passed->成功, failed->失敗, pending->テスト対象外)
           - file_path:
             - serverspec実行ルートディレクトリから見た実行ファイルの相対パス。
           - line_number:
