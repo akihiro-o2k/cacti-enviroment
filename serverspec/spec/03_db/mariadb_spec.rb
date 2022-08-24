@@ -38,7 +38,7 @@ describe "[6]#{COMMON['db_user_name']}ユーザーのmysqlshow実行結果::" do
 end
 describe '[7]configracion params check::' do
   describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep collation_server") do
-    its(:stdout)  { should match /utf8mb4_general_ci/ }
+    its(:stdout)  { should match /utf8mb4_unicode_ci/ }
   end
   describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep character_set_server") do
     its(:stdout)  { should match /utf8mb4/ }
