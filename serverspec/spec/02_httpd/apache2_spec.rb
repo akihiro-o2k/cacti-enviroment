@@ -1,8 +1,5 @@
 require 'spec_helper'
 
-# 定数定義
-PHP_INI = { :ini => COMMON['php_ini_path'] }.freeze
-
 describe '[1]apache2パッケージがインストールされている事::' do
   describe package('apache2'), :if => os[:family] == 'ubuntu' do
     it { should be_installed }
@@ -61,21 +58,27 @@ describe '[7]cacti動作に必要となるphpパッケージのインストー�
   end
 end
 
-describe '[8]PHP_config関連のテスト::' do
+describe '[8]php_config関連のテスト->' do
   # php.ini事態の存在確認。
-  describe file(COMMON['php_ini_path']) do
-    it { should be_file }
-    it { should be_mode 644 }
-    it { should be_owned_by 'root' }
-    it { should be_grouped_into 'root' }
-    # TODO:max_execution_timeパラメータのみphp_config用テストメソッドでフック出来なかった為正規表件で確認。
-    its(:content) { should match /max_execution_time = #{COMMON['php_max_execution_time']}/ }
-  end
-  # TODO:各種PHP設定パラメータの妥当性確認及び、不足があれば外部パラメータ化してserverspec/ansibleへ反映。
-  context  php_config('memory_limit', PHP_INI) do
-    its(:value) { should eq COMMON['php_memory_limit'] }
-  end
-  context  php_config('date.timezone', PHP_INI) do
-    its(:value) { should eq COMMON['time_zone'] }
+  php_ini = COMMON['php_ini']
+  php_ini.each do |php|
+    describe "#{php['path']}::" do
+      conf = { :ini => php['path'] }
+      describe file(php['path']) do
+        it { should be_file }
+        it { should be_mode 644 }
+        it { should be_owned_by 'root' }
+        it { should be_grouped_into 'root' }
+        # TODO:max_execution_timeパラメータのみphp_config用テストメソッドでフック出来なかった為正規表件で確認。
+        its(:content) { should match /max_execution_time = #{COMMON['php_max_execution_time']}/ }
+      end
+      # TODO:各種PHP設定パラメータの妥当性確認及び、不足があれば外部パラメータ化してserverspec/ansibleへ反映。
+      context  php_config('memory_limit', conf) do
+        its(:value) { should eq COMMON['php_memory_limit'] }
+      end
+      context  php_config('date.timezone', conf) do
+        its(:value) { should eq COMMON['time_zone'] }
+      end
+    end
   end
 end

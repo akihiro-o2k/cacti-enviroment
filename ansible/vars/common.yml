@@ -1,6 +1,7 @@
 ---
 
 - server_os: 'Ubuntu 20.04'
+
 - admin_user: 
   - { u_name: visualize, groups: 'lxd,sudo', pass: Visualize0033#, shell: /bin/bash, home: /home/visualize }
 
@@ -20,6 +21,7 @@
   - librrds-perl
   - snmp-mibs-downloader
   - software-properties-common
+
 - php_packages:
   - php8.1
   - libapache2-mod-php8.1
@@ -35,12 +37,15 @@
   - php8.1-pspell
   - php8.1-memcache
 
-- time_zone: Asia/Tokyo
-
-- php_ini_path: /etc/php/8.1/cli/php.ini
-- php_ini_template_path: etc/php/8.1/cli/php.ini.j2
+# php.ini関連の変数及び、php設定パラメータ
+- php_ini:
+  - { path: /etc/php/8.1/cli/php.ini, template_path: etc/php/8.1/cli/php.ini.j2 }
+  - { path: /etc/php/8.1/apache2/php.ini, template_path: etc/php/8.1/apache2/php.ini.j2 }
 - php_max_execution_time: 300
-- php_memory_limit: 256M
+- php_memory_limit: 400M
+
+
+- time_zone: Asia/Tokyo
 
 # ansible-galaxy mahdi22.mariadb_installのパラメータ
 - mariadb_version: "10.8"
@@ -55,12 +60,18 @@
 # 独自改修箇所:ミラーサイトとバージョンを同一URIで変数渡し
 # ミラーサイトからパッケージが消失するケースあり。doc/use_of_ansible-galaxy.mdに該当するエラーメッセージ例と対処方法を記載。
 - mariadb_repo: 'deb https://atl.mirrors.knownhost.com/mariadb/repo/10.8/ubuntu'
-- innodb_buffer_pool_size: '1G'
 - import_sql_file: true
 - sql_file_name:
   - { db: 'cactidb', file: '01_criate_cacti_tables.sql' }
   - { db: 'mysql', file: '02_insert_mysql_data_timezone.sql' }
   - { db: 'mysql ', file: '03_grant_select_parmission.sql' }
+
+# mariadb.conf
+- character_set_server: utf8mb4
+- collation_server: utf8mb4_unicode_ci
+- innodb_buffer_pool_size: '1G'
+- max_heap_table_size: '60.95M'
+- tmp_table_size: '60.95M'
 
 # cacti公式サイトより、バージョン指定でtarファイルをDL
 - cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz'
