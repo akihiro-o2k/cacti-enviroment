@@ -84,14 +84,15 @@
       "{{ php_packages }}"
 
 
-- name: create "{{php_ini_path}}"
+- name: create php.ini
   template:
-    src:  "{{php_ini_template_path}}"
-    dest: "{{php_ini_path}}"
+    src:  "{{ item.template_path }}"
+    dest: "{{ item.path }}"
     backup: true
     owner: root
     group: root
     mode: 0644
+  with_items: "{{ php_ini }}"
 
 # Module追加後にapache2のリロード
 - name: Reload service apache2, in all cases
