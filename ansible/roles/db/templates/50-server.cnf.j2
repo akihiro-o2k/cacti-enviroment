@@ -111,6 +111,8 @@ innodb_buffer_pool_instances=9
 innodb_doublewrite=OFF
 join_buffer_size=128M
 
+max_heap_table_size = {{ max_heap_table_size }}
+tmp_table_size = {{ tmp_table_size }}
 # this is only for embedded server
 [embedded]
 

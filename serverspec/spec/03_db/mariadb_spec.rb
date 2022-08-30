@@ -44,10 +44,10 @@ describe '[7]configracion params check::' do
     its(:stdout)  { should match /utf8mb4/ }
   end
   describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep max_heap_table_size") do
-    its(:stdout)  { should match /16777216/ }
+    its(:stdout)  { should match /#{COMMON['max_heap_table_size']}/ }
   end
   describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep tmp_table_size") do
-    its(:stdout)  { should match /16777216/ }
+    its(:stdout)  { should match /#{COMMON['tmp_table_size']}/ }
   end
   describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep innodb_file_per_table") do
     its(:stdout)  { should match /ON/ }
