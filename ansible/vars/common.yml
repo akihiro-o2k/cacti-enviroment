@@ -72,6 +72,8 @@
 - innodb_buffer_pool_size: '1G'
 - max_heap_table_size: '60.95M'
 - tmp_table_size: '60.95M'
+- max_heap_table_size: 70000000
+- tmp_table_size: 70000000
 
 # cacti公式サイトより、バージョン指定でtarファイルをDL
 - cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz'
