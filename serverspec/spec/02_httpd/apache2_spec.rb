@@ -34,8 +34,7 @@ describe "[5]/etc/apache2/apache2.confの設定内容を正規表現フックで
     it { should be_grouped_into 'root' }
     # 独自設定箇所
     its(:content) { should match /#{accept}/ }
-    # TODO:業務要件の妥当性確認(ErrorLogの出力無効化の方式の良否判定)
-    its(:content) { should match /ErrorLog \/dev\/null/ }
+    its(:content) { should match /ErrorLog \${APACHE_LOG_DIR}\/error.log/ }
   end
 end
 
@@ -46,7 +45,7 @@ describe "[6]/etc/apache2/sites-available/000-default.confの設定内容を正�
     it { should be_mode 644 }
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
-    its(:content) { should match /ErrorLog \/dev\/null/ }
+    its(:content) { should match /ErrorLog \${APACHE_LOG_DIR}\/error.log/ }
   end
 end
 # phpモジュールのインストール状態確認
@@ -71,6 +70,7 @@ describe '[8]php_config関連のテスト->' do
         it { should be_grouped_into 'root' }
         # TODO:max_execution_timeパラメータのみphp_config用テストメソッドでフック出来なかった為正規表件で確認。
         its(:content) { should match /max_execution_time = #{COMMON['php_max_execution_time']}/ }
+        its(:content) { should match /^php_error_reporting = #{COMMON['php_error_reporting']}/ }
       end
       # TODO:各種PHP設定パラメータの妥当性確認及び、不足があれば外部パラメータ化してserverspec/ansibleへ反映。
       context  php_config('memory_limit', conf) do
