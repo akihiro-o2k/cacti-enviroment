@@ -43,6 +43,8 @@
   - { path: /etc/php/8.1/apache2/php.ini, template_path: etc/php/8.1/apache2/php.ini.j2 }
 - php_max_execution_time: 300
 - php_memory_limit: 400M
+  # 暫定->実行時のエラーのみ
+- php_error_reporting: 'E_ERROR | E_WARNING | E_PARSE'
 
 
 - time_zone: Asia/Tokyo
@@ -72,7 +74,8 @@
 - innodb_buffer_pool_size: '1G'
 - max_heap_table_size: '60.95M'
 - tmp_table_size: '60.95M'
-- max_heap_table_size: 70000000
+  #- max_heap_table_size: 70000000
+- max_heap_table_size: 69999616
 - tmp_table_size: 70000000
 
 # cacti公式サイトより、バージョン指定でtarファイルをDL
