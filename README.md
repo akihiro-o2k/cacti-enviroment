@@ -1,98 +1,135 @@
-# 見える化案件用Cactiサーバープロビジョニング／テスト方式設計書
+# システム設計書
 
 ## 概要
 
-- 見える化案件において冗長構成かつ複数網に同一構成のサーバーを構築する要件の実現方式として、
-  サーバープロビジョニング及び、構成のテストをスクリプトにて自動実行を行う。
+- 「統合網トラフィック可視化基盤」(以後、案件の名称を「可視化案件」と省略表記する)における、トラフィック可視化を実現する為のシステム設計を当該文書にて定義する。
 
 ### 設計へのインプットとなる文書・及び仕様
-  - お客様配布文書「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」の求める仕様に準拠する。
-  - 上記文書の要件に基づいて導入するサーバー及びミドルウェア、ソフトウェアは「技術アーキテクチャ標準細則(第17.0版)」及び、外部文書「(別表1)標準化技術リスト(製品サポート情報etc)_20220629」の要件に準拠する。
 
+- お客様配布文書「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」の求める仕様に準拠する。
+- 上記文書の要件に基づいて導入するサーバー及びミドルウェア、ソフトウェアは「技術アーキテクチャ標準細則(第17.0版)」及び、外部文書「(別表1)標準化技術リスト(製品サポート情報etc)_20220629」の要件に準拠する。
 
-## サーバー構成
-### 基本設計(サーバー名及び、IPアドレス)
-  - 「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」６頁の「基盤構成」に記載の要件に準拠する。サーバー名（及び、サーバーホスト名）は「役割名称(小文字)」+「01/02系統」とする。
-  - TODO: IPアドレスは「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」３頁、「業務実施内容(1/2)」に記載の方針に基づき、別途お客様に定義していただく。
+## 基本設計
+
+### 動作プラットフォーム
+
+- サーバー構築を行う上でのプラットフォームは「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」2頁、及び3頁にて、お客様ご指定の「Smart Data Platform(以後、SDPFと省略表記する)」上に構築を行う。
+
+  |ワークスペース名|ワークスペースID|説明|
+  |---------|--------|---|
+  |NW-Visualization_low_SYS7037544-37298|ws0000957886|社内網可視化ツール群 ECL2.0-商用環境-共通網DMZ-FIC接続|
+
+  |リージョン|テナントID|
+  |---|---|
+  |jp3リージョン(日本/東日本)|87bc7cdf6b6c4a2bbd28497ee6d34bab|
+
+### ネットワーク構成
+
+- SDPF上にお客様側で構築済みのネットワークを使用し、以下の目的を実現する。
+- 目的
+  - サービス提供(利用者へのトラフィック可視化情報の提供)。
+  - データ取得(可視化対象となるネットワーク機器からのSNMP情報取得)。
+  - その他、サーバー構築及び、維持・管理の為のパッケージ取得等(インターネット接続)。
+
+  |名前|ロジカルネットワークID|ネットワークアドレス|ゲートウェイ|備考|
+  |---|--------|---------|--------|-----|
+  |ficgw-segment|5ad05f6a-96e8-45d2-b7df-f4169d643c90|10.223.156.144/28|-|統合網接続用|
+  |server-segment|5b775848-c1fe-4faf-8fe0-8bdb7a997a05|10.223.164.96/27|10.223.164.97|サーバー用|
+
+### サーバー名及び、IPアドレス設計
+
+- 「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」６頁の「基盤構成」に記載の要件に準拠する。サーバー名（及び、サーバーホスト名）は「役割名称(小文字)」+「01/02系統」とする。
+- TODO: 構築対象となるVMに割り当てるIPアドレスは「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」３頁、「業務実施内容(1/2)」に記載の方針に基づき、別途お客様に定義していただく。
+
       ```bash
-      [vFW]─[vLB]─┬──[server-segment (10.223.164.96/27)]
-                  ├── orion01     10.22.164.xx (orion server01号機)
-                  ├── orion02     10.22.164.xx (orion server02号機)
-                  ├── orion_db01  10.22.164.xx (orion database01号機)
-                  ├── orion_db02  10.22.164.xx (orion database02号機)
-                  ├── cacti01     10.22.164.xx (cacti01号機)
-                  ├── cacti02     10.22.164.xx (cacti02号機)
-                  └── provision   10.22.164.xx (管理用VM)
+      [vFW]─[vLB]─┬[server-segment(10.22.164.96/27)]
+                  ├── orion01     10.22.164.100 (orion server01号機)
+                  ├── orion02     10.22.164.101 (orion server02号機)
+                  ├── orion_db01  10.22.164.102 (orion database01号機)
+                  ├── orion_db02  10.22.164.103 (orion database02号機)
+                  ├── cacti01     10.22.164.108 (cacti01号機)
+                  ├── cacti02     10.22.164.109 (cacti02号機)
+                  ├── provision   10.22.164.100 (管理用VM)
+                  └── _gateway   10.22.164.97   (DefaultGateway(fw01))
       ```
+
 ### ハードウェアリソース
-  - 「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」３頁、「業務実施内容(1/2)」に記載のスペック定義方針に基づき、各サーバーに割り当てるハードウェアリソースを以下に定義する。
- - orion(01/02号機にそれぞれ下表のリソースを割り当て)
+
+- 「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」３頁、「業務実施内容(1/2)」に記載のスペック定義方針に基づき、各サーバーに割り当てるハードウェアリソースを以下に定義する。
+- orion(01/02号機にそれぞれ下表のリソースを割り当て)
    |cpu|memory|HDD|備考|
    |---|------|---|---|
-   |4  |8GB   |500GB||
+   |4  |8GB   |500GB|
 
- - orion_db(01/02号機にそれぞれ下表のリソースを割り当て)
+- orion_db(01/02号機にそれぞれ下表のリソースを割り当て)
    |cpu|memory|HDD|備考|
    |---|------|---|---|
    |8  |16GB   |500GB|ブロックストレージ-1TBをマウント|
+  - TODO: ブロックストレージの利用用途を確認。
 
- - cacti(01/02号機にそれぞれ下表のリソースを割り当て)
+- cacti(01/02号機にそれぞれ下表のリソースを割り当て)
    |cpu|memory|HDD|備考|
    |---|------|---|---|
    |2  |8GB   |1TB||
 
- - provison(管理用VMのみシングル構成)
+- provison(管理用VMのみシングル構成)
    |cpu|memory|HDD|備考|
    |---|------|---|---|
    |2  |8GB   |1TB||
-
 
 ### アプリケーション
-  - 「[設計へのインプットとなる要件及び関連文書仕様](#設計へのインプットとなる要件及び関連文書仕様)」で定義されたお客様指定のアプリケーションを導入する。
-  - 導入アプリケーション
+
+- 「[設計へのインプットとなる文書・及び仕様](#設計へのインプットとなる文書・及び仕様)」で定義されたお客様指定のアプリケーションを導入する。
+- 導入アプリケーション
     1. cacti(1.2.21)
     2. Network Performance Monitor(TODO:バージョン確認)
     3. Microsft SQL Server 2019 Stenderd(TODO:サービスパック提供状態確認)
 
+----
+
 ### Cacti動作環境構築
+
 ### ミドルウェア
-  - 選定基準
-    - Cactiの動作に必要となるミドルウェアを「[設計へのインプットとなる要件、及び、関連文書・仕様](#設計へのインプットとなる要件及び関連文書仕様)」で定義の文書に照らし合わせ、標準利用可能なミドルウェア・バージョンを選定する。
-  - 必須ミドルウェア(バージョン)
+
+- 選定基準
+  - Cactiの動作に必要となるミドルウェアを「[設計へのインプットとなる要件、及び、関連文書・仕様](#設計へのインプットとなる文書・及び仕様)」で定義の文書に照らし合わせ、標準利用可能なミドルウェア・バージョンを選定する。
+- 必須ミドルウェア(バージョン)
     1. Apache(2.4.x)
     1. php(8.1)
     1. mariadb(10.8)
-  - 特記事項
-    - php8.1で構築を進めているが、php7から8へメジャーバージョンアップに際して廃止となった関連パッケージ及びメソッドがある為、cactiの動作結果に問題が生じる際は協議の上でcacti公式サイトの想定するバージョン(php7.4以下)へのダウングレードを行うものとする。
-  - 特記事項
-    - アプリケーションはUbuntu公式が提供するaptリポジトリのバージョンが古い為、公式サイトが提供する最新版を使用する。
+- 特記事項
+  - php8.1で構築を進めているが、php7から8へメジャーバージョンアップに際して廃止となった関連パッケージ及びメソッドがある為、cactiの動作結果に問題が生じる際は協議の上でcacti公式サイトの想定するバージョン(php7.4以下)へのダウングレードを行うものとする。
+- 特記事項
+  - アプリケーションはUbuntu公式が提供するaptリポジトリのバージョンが古い為、公式サイトが提供する最新版を使用する。
+
       ```bash
       # syntax
       wget https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz
       ```
-    - 上記、cactiのバージョンは構築の方式検討開始時点でcactiの公式サイトで最新の安定版パッケージを選定したが、導入検証作業内において動作の不具合等が確認された場合はお客様と協議の上、バージョンダウン等を行い安定稼働するバージョンで納品を行う。
-  - 上記アプリケーション導入に付随して導入するネイティブパッケージ[^1]
-    - ppa:ondrej/php
-    - apt-transport-https
-    - software-properties-common
-    - dirmngr
-    - snmp
-    - snmpd
-    - rrdtool
-    - libmysql++-dev
-    - libsnmp-dev
-    - help2man
-    - dos2unix
-    - autoconf
-    - dh-autoreconf
-    - libssl-dev
-    - librrds-perl
-    - snmp-mibs-downloader
-  - その他、動作検証及び不具合時の切り分け,納品物のファイル操作等を目的として追加するネイティブパッケージ
-    - traceroute
-    - build-essential
-    - curl
-    - wget
+
+  - 上記、cactiのバージョンは構築の方式検討開始時点でcactiの公式サイトで最新の安定版パッケージを選定したが、導入検証作業内において動作の不具合等が確認された場合はお客様と協議の上、バージョンダウン等を行い安定稼働するバージョンで納品を行う。
+- 上記アプリケーション導入に付随して導入するネイティブパッケージ[^1]
+  - ppa:ondrej/php
+  - apt-transport-https
+  - software-properties-common
+  - dirmngr
+  - snmp
+  - snmpd
+  - rrdtool
+  - libmysql++-dev
+  - libsnmp-dev
+  - help2man
+  - dos2unix
+  - autoconf
+  - dh-autoreconf
+  - libssl-dev
+  - librrds-perl
+  - snmp-mibs-downloader
+- その他、動作検証及び不具合時の切り分け,納品物のファイル操作等を目的として追加するネイティブパッケージ
+  - traceroute
+  - build-essential
+  - curl
+  - wget
 
 - OSユーザー情報:
   - 初期ユーザー:
@@ -108,17 +145,20 @@
     - パスワード: V**********
     - 特記事項: Ubuntu/Linux標準の特権ユーザー。cron処理等は全てrootユーザーとして実行する。
 
+## 基本構築手順
 
-### 基本構築手順
 - 管理用VMより、各サーバー毎にスクリプトでプロビジョニング／テストを実行する為の最低限の環境を手動で構築する。
 
 ### 管理用VM
+
 - cactiサーバーを構築する上で付帯作業として構築するcactiサーバーの構成を以下に定義する。
+
 #### 動作環境
+
 - サーバーOS: Ubuntu 20.04.4 LTS
 - サーバープロビジョニング方式
   - ansible [core 2.12.6]
-    -  python version = 3.8.10 (default, Mar 15 2022, 12:22:08) [GCC 9.4.0]
+    - python version = 3.8.10 (default, Mar 15 2022, 12:22:08) [GCC 9.4.0]
     - jinja version = 2.10.1
 - サーバーテスト方式
   - serverspec (2.42.0)
@@ -133,47 +173,57 @@
   1. sshserverインストール[^2]
   1. 初期ユーザーにdevelopユーザー追加[^3]
   1. 固定IP設定ファイル編集
+
       ```bash
       # 既存の設定ファイル名の末尾にdisabledを付けて無効化しつつバックアップ
       sudo mv /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.disabled
-      # 新規設定ファイルを01として記述
-      sudo cp -p /etc/netplan/00-installer-config.yaml.disabled /etc/netplan/01-installer-config.yaml
-      # viで編集
+      # お客様ご指定のIPアドレス／サブネット等の情報をstaticな値で新規ファイルに記載し適用する。
       sudo vi /etc/netplan/01-installer-config.yaml
       ```
+
       ```yaml
       # /etc/netplan/01-installer-config.yamlの記入例
       network:
         ethernets:
           ens33:
-            addresses: [10.223.164.xx]
-            gateway4: 10.223.164.xx
+            addresses: [10.223.164.110]
+            gateway4: 10.223.164.97
             nameservers:
               addresses: [10.39.175.12,10.39.119.76]
               search: []
         version: 2
       ```
+
   1. netplanコマンドの実行(固定IP設定の適用)
+
       ```bash
       sudo netplan try --timeout 5
       # sudo netplan apply
       ```
+
   1. cacti01/02への名前解決設定(/etc/hostsで名前解決)
+
      ```bash
      # ipはお客様指定の値
      10.223.164.xx  cacti01
      10.223.164.xx  cacti02
      ```
+
   1. SSH公開鍵作成(ED25519鍵)
+
       ```bash
       # 参考-> https://linuxfan.info/ssh-ed25519
       ssh-keygen -t ed25519
       ```
+
   1. ssh-copy-idコマンドによるcacti01/02への公開鍵認証設定の実施。
+
       ```bash
         ssh-copy-id develop@[remote_host]
       ```
+
   1. ssh公開鍵認証設定
+
       ```bash
       # ~develop/.ssh/configの記入例
       Host cacti01
@@ -182,7 +232,9 @@
         Port 22
         IdentityFile ~/.ssh/id_ed25519
       ```
+
   1. サーバープロビジョニングツール:ansibleインストール
+
       ```bash
       sudo apt update -y
       sudo apt install -y software-properties-common
@@ -195,7 +247,9 @@
       sudo apt install python3-pip
       sudo pip install pexpect
       ```
+
   1. サーバー構成テストツール：sarverspecインストール
+
       ```bash
       sudo apt install ruby ruby-dev
       # rubyパッケージ管理システムgemは、環境変数http_proxyを参照してproxyの適用を判断する。
@@ -209,7 +263,9 @@
       # 依存関係パッケージのインストール(公開鍵認証->ed25519対応の為のパッケージ)
       sudo gem install highline ed25519 bcrypt_pbkdf
       ```
+
 #### cacti01/02(共通)
+
   1. Ubuntu20.04のインストール[^2]
   1. ホスト名設定[^2]
   1. sshserverインストール[^2]
@@ -219,8 +275,7 @@
   1. netplanコマンドの実行(固定IP設定の適用)
       - 管理用VM側の手順を参照。
 
-
-### サーバープロビジョニング／テスト実行方法
+### cacti01/02サーバープロビジョニング／テスト実行方法
 
 - 前提条件
   1. githubより当該スクリプトをダンロードする(暫定で個人のプライベートリポジトリに格納)
@@ -235,12 +290,14 @@
 
   1. 環境変数の設定(必須)
       - 下記の環境変数コマンドをdevelopユーザーの.bashrcに追記して適用する。
+
         ```bash
         export SUDO_PASSWD=[cacti01,02で共通するdevlopユーザーのパスワード]
         export ENVIROMENT=development
         export SSH_KEY=/home/develop/.ssh/id_ed25519
         # 設定追記後はsource ~develop/.bashrc等で設定を反映する必要あり。
         ```
+
 - サーバープロビジョニングの実施
   - 実施の概要(TestFrist方式)
     - サーバープロビジョニングは先行してserverspecを実行して、現在の状態がテストスクリプトで期待する設定になっていないことを確認(テストがエラーになることの確認)の後にansibleを実行してサーバーの構築を実施する。その後再度serverspecを実行して前回テストでエラーとなっている箇所が改善された事をもって設定の完了とする。
@@ -284,9 +341,11 @@
                 ├── spec_helper.rb  (テストコード共通設定)
                 └── vars            (../../ansible/vars/へのシンボリックリンク)
         ```
+
   - 手順
     1. serverspecでの事前設定状態確認
         - serverspecを実行し、現在のCacti01/02の状態を確認する。
+
           ```bash
           # serverspecルートディレクトリに遷移
           cd serverspec
@@ -295,10 +354,12 @@
           # -> [target_host]は/etc/hostsと~develop/.ssh/configで事前設定。
           rake serverspec:cacti01
           ```
+
         - 期待するserverspec戻り値:テスト内容をクリア出来ない事を表すRed表示。
           ![参考:green表示](doc/images/serverspec_red.png)
     1. ansibleでのサーバー設定の実施
         - ansible実行により、スクリプトに定義されているサーバー設定を実施する。
+
           ```bash
           # serverspecルートディレクトリに遷移
           cd ansible
@@ -309,8 +370,10 @@
           # ->Option： -C(Dry Runの実行),-v(詳細表示。vの数でより詳細情報を表示)
           ansible-playbook -i ${ENVIROMENT}.ini -l cacti01 deploy.yml -vvv
           ```
+
     1. serverspecの再実行(設定完了を確認)
         - serverspecを実行し、ansibleスクリプト実行後のCacti01/02の状態を確認する。
+
           ```bash
           # serverspecルートディレクトリに遷移
           cd serverspec
@@ -319,6 +382,7 @@
           # -> [target_host]は/etc/hostsと~develop/.ssh/configで事前設定。
           rake serverspec:cacti01
           ```
+
         - 期待するserverspec戻り値:テスト内容をクリアした事を表すGreen表示。
           ![参考:green表示](doc/images/serverspec_green.png)
 
@@ -330,18 +394,20 @@
   1. csv形式ファイル出力。
       - 上記、json形式ファイルを人間系で俯瞰して確認する為の一覧表としてcsvに変換した物を提出する。
 
-
 #### JSON出力ファイル
+
 - 目的
   - 標準リダイレクトでテキスト出力した結果はplain/textとなってしまう性質上、コンソール上でred/greenの表示が行われるテスト成否の配色を出力できない為、テスト毎の実施結果を文字列(statusの値)で成否判定行える形で納品する為の出力。
   - その他、serverspecの実行内容の詳細が確認できる
 - 実現方法
   - JSONファイル出力実行コマンド
-      ```bash
-      cd serverspec
-      # json形式で出力する場合の例
-      rake serverspec:cacti01 SPEC_OPTS="--format json -o /tmp/result.json"
-      ```
+
+    ```bash
+    cd serverspec
+    # json形式で出力する場合の例
+    rake serverspec:cacti01 SPEC_OPTS="--format json -o /tmp/result.json"
+    ```
+
 - 出力結果
   - JSON形式に出力したserverspec実行結果のサンプルと、jsonフォーマット定義を以下に示す。
     - コマンド実行結果サンプル
@@ -376,12 +442,13 @@
       - summary_line:
         - example_countとfailuer_countを文字列で格納。 納品段階ではexample_count数とエラー0件で合格となる。
 
-
 #### serverspec実行結果のCSV出力
+
 - 目的
   - JSON出力結果のみでは目視確認に難がある為、JSON出力した結果をjsonパーサー`jq`コマンドを介して、feild指定でCSV変換した物を合わせて納品する。
 - 実現方法
   - 実行コマンド
+
       ```bash
       # 先行してheaderを対象ファイルに書き出し。
       echo "id,status,full_description">/tmp/result.csv
@@ -395,10 +462,10 @@
 
       - 参考:csv出力ファイルのサンプル。
       ![画像:csv出力ファイルをExcelで表示](doc/images/resut.png)
+
 #### 補足
 
 [^1]: OS標準バージョンと異なるミドルウェアを導入する為に必要となるaptリポジトリの追加及び、cacti導入の為の依存関係にあるパッケージを追加。
 [^2]: インストール時の対話形式入力値。別紙「[Ubuntu20インストール手順](doc/how_to_install_ubuntu20.md)」を参照。
 [^3]: サーバープロビジョニング／テストを実行する為のテンポラリユーザー。「[Ubuntu20インストール手順](doc/how_to_install_ubuntu20.md)」内で追加し、セキュリティ観点で最終的に削除を実施。
 [^4]: serverspec(rspec)の用語で単一の`テスト`を指す文言。10件のテストを実施する場合は10examples(複数形)となる。
-
