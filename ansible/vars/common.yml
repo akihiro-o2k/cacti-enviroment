@@ -79,6 +79,6 @@
 - tmp_table_size: 70000000
 
 # cacti公式サイトより、バージョン指定でtarファイルをDL
-- cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz'
-- cacti_unarchive_path: /var/www/cacti-1.2.21
+- cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz'
+- cacti_unarchive_path: /var/www/cacti-1.2.22
 - cacti_root_path: /var/www/cacti

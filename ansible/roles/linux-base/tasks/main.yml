@@ -8,33 +8,30 @@
     dest: /etc/profile.d/proxy_setting.sh
     owner: root
     group: root
-    mode: 711
+    mode: 777
   # 適用すべき環境はstageを参照して切り替え
-  when: stage == 'production_com' or stage == 'production_biz'
-  # when: stage != 'deveropment'
+  when: stage == 'production'
 
-# 上記proxy_setting.shだけではaptが実行できない場合のみ有効化する。
-#- name: create /etc/apt/apt.conf.d/30proxy
-#  become: yes
-#  template:
-#    src: etc/apt/apt.conf.d/30proxy.j2
-#    dest: /etc/apt/apt.conf.d/30proxy
-#    backup: true 
-#    owner: root
-#    group: root
-#    mode: 0644
-#  when: stage != "deveropment"
-#
-#- name: create ~/wgetrc
-#  become: yes
-#  template:
-#    src: home/develop/wgetrc
-#    dest: /home/develop/wgetrc
-#    owner: develop
-#    group: develop
-#    mode: 644
-#  when: stage != "deveropment"
+- name: create /etc/apt/apt.conf.d/30proxy
+  become: yes
+  template:
+    src: etc/apt/apt.conf.d/30proxy.j2
+    dest: /etc/apt/apt.conf.d/30proxy
+    backup: true 
+    owner: root
+    group: root
+    mode: 0644
+  when: stage == "production"
 
+- name: create ~/wgetrc
+  become: yes
+  template:
+    src: home/develop/wgetrc
+    dest: /home/develop/wgetrc
+    owner: develop
+    group: develop
+    mode: 644
+  when: stage == "production"
 
 # proxy設定後にaptを更新
 - name: Update and upgrade apt packages
@@ -53,6 +50,7 @@
       - wget
       - software-properties-common
       - apt-transport-https
+
 # provisoning /etc/hosts
 - name: update /etc/hosts
   become: yes
@@ -90,7 +88,6 @@
   timezone:
     name: "{{ time_zone }}"
 
-
 - name: add user
   user:
     name: "{{ item.u_name }}"
@@ -109,7 +106,6 @@
     group: "{{ item.u_name }}"
     mode: '0755'
   with_items: "{{ admin_user }}"
-
 
 - name: create visualize user .bashrc
   become: yes

@@ -81,13 +81,26 @@
 
 - 「[設計へのインプットとなる文書・及び仕様](#設計へのインプットとなる文書・及び仕様)」で定義されたお客様指定のアプリケーションを導入する。
 - 導入アプリケーション
-    1. cacti(1.2.21)
-    2. Network Performance Monitor(TODO:バージョン確認)
-    3. Microsft SQL Server 2019 Stenderd(TODO:サービスパック提供状態確認)
+    1. cacti
+    2. Network Performance Monitor
+    3. Microsft SQL Server 2019 Stenderd
 
 ----
 
 ### Cacti動作環境構築
+
+### アプリケーション
+
+- cactiインストールのソース及び、バージョン定義
+  - 「【統合網トラフィック可視化基盤】構築方針書_20220616.pptx」4頁、「業務実施内容(2/2)」より引用。
+    > CactiソースコードのバージョンはNTTコムと協議の上、決定する
+    - 当該文書記載時点(2022/09/13)での最新の安定版がcacti-1.2.22となっている。
+    - アプリケーションはUbuntu公式が提供するaptリポジトリのバージョンが公式サイトの最新安定版と乖離がった為、公式サイトが提供する最新版を直接取得してインストールする方式を採用する。
+
+      ```bash
+      # cacti公式サイト（）の対象バージョンダウンロードURL
+      wget https://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz
+      ```
 
 ### ミドルウェア
 
@@ -97,18 +110,8 @@
     1. Apache(2.4.x)
     1. php(8.1)
     1. mariadb(10.8)
-- 特記事項
-  - php8.1で構築を進めているが、php7から8へメジャーバージョンアップに際して廃止となった関連パッケージ及びメソッドがある為、cactiの動作結果に問題が生じる際は協議の上でcacti公式サイトの想定するバージョン(php7.4以下)へのダウングレードを行うものとする。
-- 特記事項
-  - アプリケーションはUbuntu公式が提供するaptリポジトリのバージョンが古い為、公式サイトが提供する最新版を使用する。
 
-      ```bash
-      # syntax
-      wget https://files.cacti.net/cacti/linux/cacti-1.2.21.tar.gz
-      ```
-
-  - 上記、cactiのバージョンは構築の方式検討開始時点でcactiの公式サイトで最新の安定版パッケージを選定したが、導入検証作業内において動作の不具合等が確認された場合はお客様と協議の上、バージョンダウン等を行い安定稼働するバージョンで納品を行う。
-- 上記アプリケーション導入に付随して導入するネイティブパッケージ[^1]
+- アプリケーション導入に付随して導入するネイティブパッケージ[^1]
   - ppa:ondrej/php
   - apt-transport-https
   - software-properties-common
@@ -125,25 +128,14 @@
   - libssl-dev
   - librrds-perl
   - snmp-mibs-downloader
-- その他、動作検証及び不具合時の切り分け,納品物のファイル操作等を目的として追加するネイティブパッケージ
-  - traceroute
   - build-essential
-  - curl
-  - wget
+  - traceroute
+  - jq
 
-- OSユーザー情報:
-  - 初期ユーザー:
-    - ユーザー名: develop
-    - パスワード: develop
-    - 特記事項:初期ユーザーdevelopは構築専用のユーザー(sudo権限を付与)であるため、構築完了後には削除する。
-  - 管理用ユーザー:
-    - ユーザー名: visualize
-    - パスワード: V**********
-    - 特記事項: 初期ユーザー削除以降で使用する管理用ユーザーでsudo権限実行可能(ansibleで自動追加)
-  - OSの特権ユーザー:
-    - ユーザー名: root
-    - パスワード: V**********
-    - 特記事項: Ubuntu/Linux標準の特権ユーザー。cron処理等は全てrootユーザーとして実行する。
+- 特記事項
+  - php8.1で構築を進めているが、php7から8へメジャーバージョンアップに際して廃止となった関連パッケージ及びメソッドがある為、cactiの動作結果に問題が生じる際は協議の上でcacti公式サイトの想定するバージョン(php7.4以下)へのダウングレードを行うものとする。
+
+  - 上記、cactiのバージョンは構築の方式検討開始時点でcactiの公式サイトで最新の安定版パッケージを選定したが、導入検証作業内において動作の不具合等が確認された場合はお客様と協議の上、バージョンダウン等を行い安定稼働するバージョンで納品を行う。
 
 ## 基本構築手順
 
@@ -171,18 +163,29 @@
   1. Ubuntu20.04のインストール[^2]
   1. ホスト名設定[^2]
   1. sshserverインストール[^2]
-  1. 初期ユーザーにdevelopユーザー追加[^3]
+  1. 初期ユーザーにdevelopユーザー追加
+
+      ```bash
+      sudo mkdir /home/develop
+      sudo useradd develop -s /bin/bash -h /home/develop
+      sudo usermod -aG sudo develop
+      sudo chown develop:develop /home/develop
+      sudo cp -p ~ubuntu/.bashrc ~develop/.bashrc
+      sudo chown develop:develop ~develop/.bashrc
+      ```
+
   1. 固定IP設定ファイル編集
 
       ```bash
       # 既存の設定ファイル名の末尾にdisabledを付けて無効化しつつバックアップ
       sudo mv /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.disabled
       # お客様ご指定のIPアドレス／サブネット等の情報をstaticな値で新規ファイルに記載し適用する。
-      sudo vi /etc/netplan/01-installer-config.yaml
+      sudo vi /etc/netplan/01-netcfg.yaml
       ```
 
+      - 以下、01-netcfg.yamlの記入例
+
       ```yaml
-      # /etc/netplan/01-installer-config.yamlの記入例
       network:
         ethernets:
           ens33:
@@ -197,16 +200,26 @@
   1. netplanコマンドの実行(固定IP設定の適用)
 
       ```bash
-      sudo netplan try --timeout 5
-      # sudo netplan apply
+      sudo netplan apply
       ```
+
+  1. proxy設定
+      1. ansible/roles/linux-base/templates/etc/profile.d/proxy_setting.shを手動編集し、
+    /etc/profile.d/proxy_setting.shとして配備。
+      1. ansible/roles/linux-base/templates/etc/apt/apt.conf.d/30proxy.j2を手動編集し、/etc/apt/apt.conf.d/30proxyとして配備。
+      - 設定値に関する特記事項
+        - 各種パラメーター設定値はansible/vars/production.ymlを参照。
+        - 尚、パラメーターproxy_passに関しては、該当ユーザーのAzureAD認証情報と同一値となる為、仮の値(文字列「replace」)をansibleのスクリプト実行前直前で置換して対応する。
 
   1. cacti01/02への名前解決設定(/etc/hostsで名前解決)
 
      ```bash
-     # ipはお客様指定の値
-     10.223.164.xx  cacti01
-     10.223.164.xx  cacti02
+     10.22.164.100 orion01
+     10.22.164.101 orion02
+     10.22.164.102 orion_db01
+     10.22.164.103 orion_db02
+     10.22.164.108 cacti01
+     10.22.164.109 cacti02
      ```
 
   1. SSH公開鍵作成(ED25519鍵)
