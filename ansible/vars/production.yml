@@ -1,0 +1,28 @@
+---
+
+- server_hosts:
+   - "10.223.164.100  orion01"
+   - "10.223.164.101  orion02"
+   - "10.223.164.102  orion_db01"
+   - "10.223.164.103  orion_db02"
+   - "10.223.164.108  cacti01"
+   - "10.223.164.109  cacti02"
+
+
+- prompt: 31
+
+- ntp_servers:
+  - 10.39.64.3
+  - 10.39.72.3
+
+#- dns:
+#  - "10.39.175.12 10.39.119.76"
+
+- proxy_user:
+  - B014944
+- proxy_pass:
+  - replace
+- proxy_server:
+  - erproxy.noc.ntt.com
+- proxy_port:
+  - 50080
