@@ -44,6 +44,16 @@ describe "[5]/var/www/cacti/include/config.php(mariadb接続設定ファイル)�
     end
   end
 end
+
+describe "[6]cacti-plugin  weathermapインストール状態確認::" do
+  describe file('/var/www/cacti/site/plugins/weathermap.conf') do
+    it { should be_file }
+    it { should be_mode 644 }
+    it { should be_owned_by 'www-data' }
+    it { should be_grouped_into 'www-data' }
+  end
+end
+
 describe '[6]NXXXXXXが指定する、共通網、業務網内のNWノードをDevice登録し、SNMPによる情報取得ができること。（FW遮断などネットワーク要因の場合は除く）::' do
   pending
 end

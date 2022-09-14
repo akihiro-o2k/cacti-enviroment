@@ -5,6 +5,18 @@
     name:
       "{{ native_packages }}"
 
+- name: directory check
+  stat:
+    path: "{{ cacti_root_path  }}"
+  register: d
+
+- name: debug d
+  debug:
+    msg: "skip skip skip"
+    msg: "{{ d }}"
+  when:
+    - d.stat.exists == true
+    - d.stat.isdir == true
 
 - name: download & unzip cacti.tar.gz
   ansible.builtin.unarchive:
@@ -14,31 +26,21 @@
     group: www-data
     mode: 0755
     remote_src: yes
-
-- name: directory check
-  stat:
-    path: "{{ cacti_root_path  }}"
-  register: d
-
-#- name: debug d
-#  debug:
-#    msg: "skip skip skip"
-#  when:
-#    - d.stat.exists == true
-#    - d.stat.isdir == true
-
-- name: directory_name chenge
-  command:
-    cmd: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
-    removes: "{{ cacti_unarchive_path }}"
-    #  when:
-    #- d.stat.exists == false
-    #- d.stat.isdir == false
+  when:
+    - d.stat.exists != true
+    - d.stat.isdir != true
 
 - name: unarchive_dir_check
   stat:
     path: "{{ cacti_unarchive_path }}"
   register: u
+
+- name: directory_name chenge
+  command:
+    cmd: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
+  when:
+    - d.stat.isdir != true and u.stat.isdir == true
+
 
 - name: erace unarchive_dir
   command:
@@ -57,9 +59,16 @@
     group: root
     mode: 0644
 
+- name: symbolic link check
+  stat:
+    path: /etc/apache2/sites-enabled/cacti.conf
+  register: s
+
 - name: create symbleic_link cacti.conf
   command:
     cmd: "ln -s /etc/apache2/sites-available/cacti.conf /etc/apache2/sites-enabled/cacti.conf"
+  when:
+    - s.stat.islnk != true
 
 - name: Restart service apache2
   ansible.builtin.systemd:
@@ -75,3 +84,43 @@
     owner: www-data
     group: www-data
     mode: 0755
+
+- name: check NetworkWeathermap setting file
+  stat:
+    path: /var/www/cacti/site/plugins/weathermap.conf
+  register: w
+
+- name: create .gitconfig
+  become: yes
+  template:
+    src: .gitconfig.j2
+    dest: /home/develop/.gitconfig
+    owner: develop
+    group: develop
+    mode: 0644
+  when: stage == "production"
+
+- name: Install NetworkWeathermap
+  git:
+    repo: https://github.com/howardjones/network-weathermap.git
+    dest: /var/www/cacti/site/plugins
+  become: yes
+  when:
+    - w.stat.exists != true
+
+- name: plugins owner chenge
+  command:
+      cmd: 'chown -R www-data:www-data /var/www/cacti/site/plugins/'
+
+- name: setup npm proxy
+  command:
+     cmd: "npm config set {{ item }} http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}"
+  with_items:  
+    - proxy
+    - https-proxy
+  when: stage == "production"
+
+- name: Install "bower" node.js package globally.
+  npm:
+    name: bower 
+    global: yes

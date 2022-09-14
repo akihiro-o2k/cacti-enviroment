@@ -1,0 +1,27 @@
+[user]
+    name = akihiro-o2k
+    email = akihiro.otuka@ntt.com
+
+[color]
+    ui = true
+[alias]
+    ad = add
+    br = branch
+    ci = commit
+    co = checkout
+    dif = diff
+    di = diff
+    difc = diff --cached
+    st = status
+    l = log --graph --date=iso --pretty='format:%Cred%h%Creset :%C(yellow)%d%Creset %s %Cgreen[%ad] %C(bold blue)<%an>%Creset'
+    #l = log --pretty='format:%C(yellow)%h %C(green)%cd %C(reset)%s %C(red)%d %C(cyan)[%an]' --date=iso --graph
+    mer = merge --no-ff
+[merge]
+    ff = false
+
+[http]
+        proxy = http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}
+[https]
+        proxy = http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}
+[url "https://"]
+        insteadOf = git://
