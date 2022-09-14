@@ -37,19 +37,19 @@ describe "[6]#{COMMON['db_user_name']}ユーザーのmysqlshow実行結果::" do
   end
 end
 describe '[7]configracion params check::' do
-  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep collation_server") do
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep collation_server|xargs") do
     its(:stdout)  { should match /utf8mb4_unicode_ci/ }
   end
-  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep character_set_server") do
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep character_set_server|xargs") do
     its(:stdout)  { should match /utf8mb4/ }
   end
-  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep max_heap_table_size") do
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep max_heap_table_size|xargs") do
     its(:stdout)  { should match /#{COMMON['max_heap_table_size']}/ }
   end
-  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep tmp_table_size") do
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep tmp_table_size|xargs") do
     its(:stdout)  { should match /#{COMMON['tmp_table_size']}/ }
   end
-  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep innodb_file_per_table") do
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} variables |grep innodb_file_per_table|xargs") do
     its(:stdout)  { should match /ON/ }
   end
 end

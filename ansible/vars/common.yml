@@ -21,6 +21,10 @@
   - librrds-perl
   - snmp-mibs-downloader
   - software-properties-common
+  - cacti-spine
+  - nodejs
+  - npm
+  - git
 
 - php_packages:
   - php8.1
