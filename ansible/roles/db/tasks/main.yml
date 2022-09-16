@@ -16,3 +16,8 @@
 
 - name: Initiate Databses users and table
   include_tasks: initiate_database.yml
+
+- name: Restart service apache2
+  ansible.builtin.systemd:
+    name: mariadb.service
+    state: restarted
