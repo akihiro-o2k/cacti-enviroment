@@ -151,3 +151,16 @@
           with_items: "{{ sql_file_name }}"
           when: "{{ import_sql_file }}"
         ```
+
+1. roles/db/tasks/main.yml
+    - 変更の概要
+      - 50-server.cnfをアップロードし再起動で反映するはずの各種パラメータが反映しない事象が発生した為、最後の処理で再起動する振る舞いを追記。
+
+    - code
+      - [origin:](https://github.com/mahdi22/ansible-mariadb-install/blob/master/tasks/main.yml)
+        ```yaml
+        - name: Restart service mariadb-server
+          ansible.builtin.systemd:
+            name: mariadb.service
+            state: restarted
+        ```
