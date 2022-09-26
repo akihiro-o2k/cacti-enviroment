@@ -105,12 +105,20 @@
 - name: setup npm proxy
   command:
      cmd: "npm config set {{ item }} http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}"
-  with_items:  
+  with_items:
     - proxy
     - https-proxy
   when: stage == "production"
 
 - name: Install "bower" node.js package globally.
   npm:
-    name: bower 
+    name: bower
     global: yes
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Upgrade the OS (apt-get dist-upgrade)
+  ansible.builtin.apt:
+    upgrade: dist
