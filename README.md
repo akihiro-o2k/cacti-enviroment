@@ -43,14 +43,14 @@
 
     ```bash
       [vFW]─[vLB]─┬[server-segment(10.22.164.96/27)]
-                  ├── orion01     10.22.164.100 (orion server01号機)
-                  ├── orion02     10.22.164.101 (orion server02号機)
-                  ├── orion_db01  10.22.164.102 (orion database01号機)
-                  ├── orion_db02  10.22.164.103 (orion database02号機)
-                  ├── cacti01     10.22.164.108 (cacti01号機)
-                  ├── cacti02     10.22.164.109 (cacti02号機)
-                  ├── provision   10.22.164.110 (管理用VM)
-                  └── _gateway   10.22.164.97   (DefaultGateway(fw01))
+                  ├── orion01     10.223.164.100 (orion server01号機)
+                  ├── orion02     10.223.164.101 (orion server02号機)
+                  ├── orion_db01  10.223.164.102 (orion database01号機)
+                  ├── orion_db02  10.223.164.103 (orion database02号機)
+                  ├── cacti01     10.223.164.108 (cacti01号機)
+                  ├── cacti02     10.223.164.109 (cacti02号機)
+                  ├── provision   10.223.164.110 (管理用VM)
+                  └── _gateway    10.223.164.97   (DefaultGateway(fw01))
     ```
 
 ### ハードウェアリソース

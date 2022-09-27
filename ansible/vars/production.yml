@@ -18,11 +18,9 @@
 #- dns:
 #  - "10.39.175.12 10.39.119.76"
 
-- proxy_user:
-  - B014944
-- proxy_pass:
-  - replace
-- proxy_server:
-  - erproxy.noc.ntt.com
-- proxy_port:
-  - 50080
+- proxy_user: B014944
+- proxy_pass:  replace
+- proxy_server: erproxy.noc.ntt.com
+- proxy_port: 50080
+- use_proxy: yes
+- proxy_env: "http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}"
