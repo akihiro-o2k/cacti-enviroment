@@ -71,6 +71,7 @@
   apt_key:
     url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c
     state: present
+  #environment: "{{ proxy_env }}"
   #when:
     #- use_proxy is defined
     #- use_proxy

@@ -23,4 +23,5 @@
 - proxy_server: erproxy.noc.ntt.com
 - proxy_port: 50080
 - use_proxy: yes
-- proxy_env: "http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}"
+- proxy_env: 
+  - "http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}"
