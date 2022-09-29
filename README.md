@@ -131,6 +131,7 @@
   - build-essential
   - traceroute
   - jq
+  - libproxy-tools
 
 - 特記事項
   - php8.1で構築を進めているが、php7から8へメジャーバージョンアップに際して廃止となった関連パッケージ及びメソッドがある為、cactiの動作結果に問題が生じる際は協議の上でcacti公式サイトの想定するバージョン(php7.4以下)へのダウングレードを行うものとする。
@@ -210,6 +211,32 @@
       - 設定値に関する特記事項
         - 各種パラメーター設定値はansible/vars/production.ymlを参照。
         - 尚、パラメーターproxy_passに関しては、該当ユーザーのAzureAD認証情報と同一値となる為、仮の値(文字列「replace」)をansibleのスクリプト実行前直前で置換して対応する。
+
+      1. 各種http-requestを通す為に「.curlrc」の作成
+          ```bash
+          # 事前にlibproxy-toolsのインストールが必要
+          echo "proxy = http://${proxy_user}:${proxy_pass}@${proxy_server}:${proxy_port}">~/.curlrc
+          echo insercure>>~/.curlrc
+          source ~/.curlrc
+          ```
+      1. パッケージのダウンロードを実施するwgetrcにもproxy設定を実施
+          ```bash
+          echo "http_proxy=$http_proxy/ > ~/.wgetrc
+          echo "https_proxy=$http_proxy/ >> ~/.wgetrc
+          echo "check_certificate = off" >> ~/.wgetrc
+          ```
+      1. gitconfigにも同様にproxy設定を追加
+          ```bash
+          cat <<-EOF>~/.gitconfig
+          [user]
+             name = akihiro-o2k
+             mail = akihiro.otuka@ntt.com
+          [http]
+             sslverify = false
+          EOF
+          echo "    proxy = $http_proxy" >>~/.gitconfig
+          source ~/.gitconfig
+          ```
 
   1. cacti01/02への名前解決設定(/etc/hostsで名前解決)
 
