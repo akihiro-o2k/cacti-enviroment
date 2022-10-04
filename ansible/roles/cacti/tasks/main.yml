@@ -75,46 +75,6 @@
     group: www-data
     mode: 0755
 
-- name: check NetworkWeathermap setting file
-  stat:
-    path: /var/www/cacti/site/plugins/weathermap.conf
-  register: w
-
-- name: create .gitconfig
-  become: yes
-  template:
-    src: .gitconfig.j2
-    dest: /home/develop/.gitconfig
-    owner: develop
-    group: develop
-    mode: 0644
-  when: stage == "production"
-
-- name: Install NetworkWeathermap
-  git:
-    repo: https://github.com/howardjones/network-weathermap.git
-    dest: /var/www/cacti/site/plugins
-  become: yes
-  when:
-    - w.stat.exists != true
-
-- name: plugins owner chenge
-  command:
-      cmd: 'chown -R www-data:www-data /var/www/cacti/site/plugins/'
-
-- name: setup npm proxy
-  command:
-     cmd: "npm config set {{ item }} http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}"
-  with_items:
-    - proxy
-    - https-proxy
-  when: stage == "production"
-
-- name: Install "bower" node.js package globally.
-  npm:
-    name: bower
-    global: yes
-
 - name: Run the equivalent of "apt-get update" as a separate step
   ansible.builtin.apt:
     update_cache: yes
