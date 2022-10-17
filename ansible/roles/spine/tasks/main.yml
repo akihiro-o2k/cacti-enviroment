@@ -1,0 +1,82 @@
+---
+
+- name: install spine native dependency package
+  become: yes
+  apt:
+    name: "{{ spine_packages }}"
+
+- name: result1-check cacti-spine.tar.gz exists?
+  stat:
+    path: "/tmp/cacti-spine-{{ spine_version }}.tar.gz"
+  register: result1
+  ignore_errors: yes
+  
+- name: result1 check
+  debug:
+    msg: "{{ result1.stat.exists }}"
+
+# 商用はSCPで/tmpにアップロード
+- name: development get cacti-spine source file
+  ansible.builtin.get_url:
+    url: "https://www.cacti.net/downloads/spine/cacti-spine-{{ spine_version }}.tar.gz"
+    dest: /tmp
+    mode: '0770'
+  when: result1.stat.exists==false
+    and stage == 'development'
+
+- name: result2-check cacti-spine.tar.gz exists?
+  stat:
+    path: "/tmp/cacti-spine-{{ spine_version }}.tar.gz"
+  register: result2
+  ignore_errors: yes
+
+- name: unarchive spine.tar.gz
+  unarchive:
+    # cacti-spine-1.2.22.tar.gz
+    src: "/tmp/cacti-spine-{{ spine_version }}.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+  when: result2.stat.exists==true
+
+- name: spine-unarchive-dir-check
+  stat:
+    path: "/tmp/cacti-spine-{{ spine_version }}"
+  register: result3
+  ignore_errors: yes
+
+- name: spein bin exist?
+  stat:
+   path: /usr/local/spine/bin/spine
+  register: result4
+  ignore_errors: yes
+
+- name: ./bootstrap ./configure make make install
+  become: yes
+  command:
+    chdir: "/tmp/cacti-spine-{{ spine_version }}"
+    cmd: "sudo {{ item }}"
+  with_items:
+    - ./bootstrap
+    - ./configure
+    - make
+    - make install
+  when: result3.stat.isdir==true and result4.stat.exists==false
+
+- name: chown spine
+  become: yes
+  command:
+    cmd: "chown root:root /usr/local/spine/bin/spine"
+
+- name: chmod spine
+  become: yes
+  command:
+     cmd: "chmod +s /usr/local/spine/bin/spine"
+
+- name: create /usr/local/spine/etc/spine.conf
+  become: yes
+  template:
+    src: spine.conf.j2
+    dest: /usr/local/spine/etc/spine.conf
+    owner: root
+    group: root
+    mode: '0644'

@@ -17,10 +17,12 @@
     - httpd
     - db
     - cacti
+    - spine
   tags:
     - httpd
     - db
     - cacti
+    - spine
 - hosts: cacti02
   vars_files:
     - vars/{{ stage }}.yml
