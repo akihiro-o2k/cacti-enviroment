@@ -7,13 +7,11 @@
 #  /etc/profile.d/
 # ================================================================
 # 以下、proxy関連パラメータを変数として定義。構築段階では
-export proxy_user={{ proxy_user }}
-export proxy_pass={{ proxy_pass }}
 export proxy_server={{ proxy_server }}
 export proxy_port={{ proxy_port }}
 
 # 以下、proxyの実態設定値()
-export http_proxy="http://${proxy_user}:${proxy_pass}@${proxy_server}:${proxy_port}"
+export http_proxy="http://${proxy_server}:${proxy_port}"
 export https_proxy=$http_proxy
 export ftp_proxy=$http_proxy
 # 以下、pipがproxyを参照する際に使用する変数(NET上の調査では大文字だった為、保険で登録)
