@@ -23,6 +23,12 @@
     mode: 0644
   when: stage == "production"
 
+- name: install libproxy-tools
+  apt:
+    name:
+      - libproxy-tools
+  when: stage == 'production'
+
 - name: create ~/wgetrc
   become: yes
   template:
@@ -60,6 +66,26 @@
     owner: root
     group: root
     mode: 0644
+ 
+# 商用環境のsystemd-timesyncdがmaskされている問題->ummaskする。
+- name: unmask systemd-timesyncd
+  become: yes
+  command:
+    cmd: 'systemctl unmask systemd-timesyncd'
+  when: stage == 'production'
+
+# 商用環境のsystemd-timesyncdがmaskされている問題の別対処。
+#- name: install systemd-timesyncd
+#  ansible.builtin.apt:
+#    name: systemd-timesyncd
+#    state: latest
+#    update_cache: yes
+
+- name: Start service systemd-timesyncd, , in all cases
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+
 
 - name: create /etc/systemd/timesyncd.conf
   become: yes
@@ -123,10 +149,3 @@
     name: root
     password:  "{{ root_passwd | password_hash('sha512') }}"
 
-#- name: specify DNS
-#  lineinfile:
-#    state: present
-#    dest: /etc/systemd/resolved.conf
-#    regexp: ^#DNS=$
-#    line: 'DNS={{ dns }}'
-#  register: dns_conf_result
