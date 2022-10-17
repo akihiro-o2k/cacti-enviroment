@@ -21,9 +21,11 @@
   - librrds-perl
   - snmp-mibs-downloader
   - software-properties-common
-  - nodejs
-  - npm
   - git
+
+- spine_packages:
+  - build-essential
+  - libmysqld-dev
 
 - php_packages:
   - php8.1
@@ -70,6 +72,7 @@
   - { db: 'cactidb', file: '01_criate_cacti_tables.sql' }
   - { db: 'mysql', file: '02_insert_mysql_data_timezone.sql' }
   - { db: 'mysql ', file: '03_grant_select_parmission.sql' }
+  - { db: 'cactidb', file: '04_alter_database_set_utfmb4.sql' }
 
 # mariadb.conf
 - character_set_server: utf8mb4
@@ -85,3 +88,4 @@
 - cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz'
 - cacti_unarchive_path: /var/www/cacti-1.2.22
 - cacti_root_path: /var/www/cacti
+- spine_version: '1.2.22'

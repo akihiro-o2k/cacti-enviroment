@@ -27,7 +27,7 @@
   become: yes
   template:
     src: home/develop/wgetrc
-    dest: /home/develop/wgetrc
+    dest: /home/develop/.wgetrc
     owner: develop
     group: develop
     mode: 644
