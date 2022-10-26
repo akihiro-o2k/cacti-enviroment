@@ -45,27 +45,37 @@ describe "[5]/var/www/cacti/include/config.php(mariadb接続設定ファイル)�
   end
 end
 
+describe "[6] poller設定ファイル(/etc/cron.d/cacti)の確認::" do
+  describe file('/etc/cron.d/cacti') do
+    it { should be_file }
+    it { should be_mode 755 }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
+    its(:content) { should match /*\/5 * * * */ }
+    its(:content) { should match /php\ \/var\/www\/cacti/\poller.php }
+  end
+end
 
-describe '[6]NXXXXXXが指定する、共通網、業務網内のNWノードをDevice登録し、SNMPによる情報取得ができること。（FW遮断などネットワーク要因の場合は除く）::' do
+describe '[7]NXXXXXXが指定する、共通網、業務網内のNWノードをDevice登録し、SNMPによる情報取得ができること。（FW遮断などネットワーク要因の場合は除く）::' do
   pending
 end
 
-describe '[7]登録したDeviceにおいて問題なくGraph設定が実施でき、グラフの描画が正常であること::' do
+describe '[8]登録したDeviceにおいて問題なくGraph設定が実施でき、グラフの描画が正常であること::' do
   pending
 end
 
-describe '[8]Deviceの削除が問題なく実施できること::' do
+describe '[9]Deviceの削除が問題なく実施できること::' do
   pending
 end
 
-describe '[9]任意のUserを登録し、正常に登録完了すること::' do
+describe '[10]任意のUserを登録し、正常に登録完了すること::' do
   pending
 end
 
-describe '[10]Userに設定したロールに関し、指定した権限以外の処理ができないこと::' do
+describe '[11]Userに設定したロールに関し、指定した権限以外の処理ができないこと::' do
   pending
 end
 
-describe '[11]Userの削除が問題なく実施できること::' do
+describe '[12]Userの削除が問題なく実施できること::' do
   pending
 end
