@@ -48,11 +48,10 @@ end
 describe "[6] poller設定ファイル(/etc/cron.d/cacti)の確認::" do
   describe file('/etc/cron.d/cacti') do
     it { should be_file }
-    it { should be_mode 755 }
+    it { should be_mode 644 }
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
-    its(:content) { should match /*\/5 * * * */ }
-    its(:content) { should match /php\ \/var\/www\/cacti/\poller.php }
+    its(:content) { should match /php\ \/var\/www\/cacti\/poller.php/ }
   end
 end
 

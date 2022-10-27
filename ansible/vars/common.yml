@@ -22,10 +22,10 @@
   - snmp-mibs-downloader
   - software-properties-common
   - git
+  - smbclient
 
 - spine_packages:
   - build-essential
-  - libmysqld-dev
 
 - php_packages:
   - php8.1

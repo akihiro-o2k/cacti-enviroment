@@ -83,7 +83,7 @@
 
 - name: Start service systemd-timesyncd, , in all cases
   ansible.builtin.service:
-    name: httpd
+    name: systemd-timesyncd
     state: restarted
 
 
