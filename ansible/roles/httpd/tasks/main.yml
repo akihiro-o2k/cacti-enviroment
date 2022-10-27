@@ -109,7 +109,6 @@
     name:
       "{{ php_packages }}"
 
-
 - name: create php.ini
   template:
     src:  "{{ item.template_path }}"
@@ -126,11 +125,18 @@
     name: apache2.service
     state: reloaded
 
-# php動作確認fileのアップロード
-- name: create /var/www/html/info.php
+# ログファイル退避用ディレクトリ作成
+# todo: 外部ストレージが利用可能段階で修正が必要
+- name: mkdir /mnt/storate01
+  become: yes
+  command:
+    cmd: "mkdir -p /mnt/storate01/{{ansible_hostname}}/apache2"
+
+# logrotate後のpostrotateで使用するスクリプトhttpd-prerotateのアップロード 
+- name: create /etc/logrotate.d/httpd-prerotate
   template:
-    src: var/www/html/info.php
-    dest: /var/www/html/info.php
+    src: etc/logrotate.d/httpd-prerotate
+    dest: /etc/logrotate.d/httpd-prerotate
     owner: root
     group: root
     mode: 0644

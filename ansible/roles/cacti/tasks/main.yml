@@ -83,14 +83,13 @@
   ansible.builtin.apt:
     upgrade: dist
 
-- name: add www-data group
-  becom: yes
+- name: append wwwdata group
+  become: yes
   command:
-    cmd: "sudo usermod -aG www-data {{ item }}"
-  whth_items:
+    cmd: "usermod -aG www-data {{ item }}"
+  with_items:
     - develop
     - visualize
-
 
 - name: create /etc/cron.d/cacti (poller setting)
   become: yes
@@ -99,4 +98,4 @@
     dest: /etc/cron.d/cacti
     owner: root
     group: root
-    mode: 0755
+    mode: 0644

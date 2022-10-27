@@ -82,3 +82,12 @@ describe '[8]php_config関連のテスト->' do
     end
   end
 end
+# logrotate
+describe '[0]/etc/logrotate.d/httpd-prerotate::' do
+  describe file('/etc/logrotate.d/httpd-prerotate') do
+    it { should be_file }
+    it { should be_mode 644 }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
+  end
+end
