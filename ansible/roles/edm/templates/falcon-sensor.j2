@@ -1,0 +1,8 @@
+/var/log/falcon-sensor.log {
+    rotate 24
+    monthly
+    sharedscripts
+    postrotate
+        /usr/bin/pkill -HUP falcon-sensor
+    endscript
+} 
