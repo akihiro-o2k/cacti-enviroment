@@ -18,11 +18,13 @@
     - db
     - cacti
     - spine
+    - edm
   tags:
     - httpd
     - db
     - cacti
     - spine
+    - edm
 - hosts: cacti02
   vars_files:
     - vars/{{ stage }}.yml
@@ -31,7 +33,10 @@
     - httpd
     - db
     - cacti
+    - spin
+    - edm
   tags:
     - httpd
     - db
     - cacti
+    - edm

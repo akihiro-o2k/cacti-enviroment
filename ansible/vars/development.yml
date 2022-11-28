@@ -19,3 +19,5 @@
 - use_proxy: no
 - proxy_env:
 
+- cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz'
+
