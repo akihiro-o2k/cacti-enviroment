@@ -56,25 +56,30 @@
     enabled: yes
 
 # ->Ubuntu20でインストールできるphpは7.4の為、リポジトリを追加
-#- name: Installs the ppa:ondrej/php repo on Ubuntu systems
-#  apt_repository:
-#    repo: ppa:ondrej/php
-#    update_cache: true
-#  when:
-#    - ansible_distribution == 'Ubuntu'
-#    - stage == 'development'
+- name: Installs the ppa:ondrej/php repo on Ubuntu systems
+  apt_repository:
+    repo: ppa:ondrej/php
+    update_cache: true
+  when: stage == 'development'
 
 # 商用環境でapt_repositoryが通らない問題への対処
-# 手動でppa:ondrej/phpのGPGKEYを追加。
+# 手動でppa:ondrej/phpのGPGKEYを追加。ppa_ondrej.key
 # https://launchpad.net/~ondrej/+archive/ubuntu/php
-- name: Add ppa:ondrej/php Repository Key
-  apt_key:
-    url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c
+- name: uplaod ppa:ondrej/php  Key file
+  template:
+    src:  tmp/ppa_ondrej.key
+    dest: /tmp/ppa_ondrej.key
+    owner: root
+    group: root
+    mode: 0644
+  when: stage == 'production'
+
+- name: add ppa:ondrej apt-key
+  ansible.builtin.apt_key:
+    file: /tmp/ppa_ondrej.key
     state: present
-  #environment: "{{ proxy_env }}"
-  #when:
-    #- use_proxy is defined
-    #- use_proxy
+  when: stage == 'production'
+
 
 # 商用環境でapt_repositoryが通らない問題への対処
 # 手動で/etc/apt/sources.listにリポジトリを追加
@@ -83,18 +88,7 @@
     repo: "deb https://ppa.launchpadcontent.net/ondrej/php/ubuntu focal main"
     state: present
     filename: ppa_ondrej_php
-  #environment: "{{ proxy_env }}"
-  #when:
-    #- use_proxy is defined
-    #- use_proxy
-
-#- name: Install repository ppa:ondrej/php
-#  become: yes
-#  expect:
-#    command: add-apt-repository ppa:ondrej/php
-#    responses:
-#      # 対話式で期待する文字列が発生したら空白[＋Enter]を送信
-#      (.*)Press \[ENTER\] to continue or Ctrl-c to cancel adding it.(.*): ''
+  when: stage == 'production'
 
 # php8.0以降のパッケージをインストールする為にaptリポジトリの更新
 - name: Apt update

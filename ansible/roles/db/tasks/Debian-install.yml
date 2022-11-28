@@ -21,12 +21,31 @@
   when:
     - use_proxy is defined
     - use_proxy
+    - stage == 'development'
 
 - name: Add MariaDB Repository Key for {{ ansible_distribution }}
   apt_key:
     url: "{{ key_url }}"
     state: present
-  when: (use_proxy is not defined) or (not use_proxy)
+  when: 
+    - (use_proxy is not defined) or (not use_proxy)
+    - stage == 'development'
+
+- name: add mariadb key
+  template:
+    src: mariadb.key
+    dest: /tmp/mariadb.key
+    owner: root
+    group: root
+    mode: 0644
+  when: stage == 'development'
+
+- name: add mariadb apt-key
+  ansible.builtin.apt_key:
+    file: /tmp/mariadb.key
+    state: present
+  when: stage == 'production'
+
 
 - name: Add MariaDB Repository for {{ ansible_distribution }}
   apt_repository:
