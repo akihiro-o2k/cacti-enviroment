@@ -167,12 +167,18 @@
   1. 初期ユーザーにdevelopユーザー追加
 
       ```bash
+      # developユーザーのhomeディレクトリ作成
       sudo mkdir /home/develop
-      sudo useradd develop -s /bin/bash -h /home/develop
+      # developユーザー追加
+      sudo useradd develop -s /bin/bash -d /home/develop
+      # sudoグループ追加でsudo実行権限付与
       sudo usermod -aG sudo develop
-      sudo chown develop:develop /home/develop
+      # .bashrcを複製して適用
       sudo cp -p ~ubuntu/.bashrc ~develop/.bashrc
-      sudo chown develop:develop ~develop/.bashrc
+      # ディレクトリのオーナーをdevelopユーザーに変更
+      sudo chown -R develop:develop /home/develop
+      # developユーザーのパスワードを設定(passwd設定値「develop」)
+      sudo passwd develop
       ```
 
   1. 固定IP設定ファイル編集
@@ -190,13 +196,27 @@
       network:
         ethernets:
           ens33:
-            addresses: [10.223.164.110]
+            addresses: [10.223.164.110/27]
             gateway4: 10.223.164.97
             nameservers:
               addresses: [10.39.175.12,10.39.119.76]
               search: []
         version: 2
       ```
+  1. /etc/ssh/sshd_configの編集
+      ```bash
+      # バックアップの実施
+      sudo cp -p /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
+      # PasswordAuthnication noの無効化
+      sudo vi /etc/ssh/sshd_config
+      # viコマンドでsedを実行して保存終了
+      :%s/PasswordAuthentication no/PasswordAuthentication yes/
+      # ssdのsyntax確認コマンドを実行(期待値:戻り値なし)
+      sudo /usr/sbin/sshd -t
+      # restart sshd
+      sudo systemctl restart sshd && sudo systemctl status sshd 
+      ```
+      上記構築対象VMで設定を実施後にansible実行ホストからのssh接続を実施して動作確認。
 
   1. netplanコマンドの実行(固定IP設定の適用)
 
