@@ -26,20 +26,19 @@
     group: www-data
     mode: 0755
     remote_src: yes
+  when: d.stat.isdir == False
 
 - name: unarchive_dir_check
   stat:
     path: "{{ cacti_unarchive_path }}"
   register: u
 
+
 - name: directory_name chenge
   command:
     cmd: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
+  when: u.stat.isdir == true and d.stat.isdir == False
 
-
-- name: erace unarchive_dir
-  command:
-    cmd: "rm -rf {{ cacti_unarchive_path }}"
 
 - name: create a new virtual host file for the Cacti site
   become: yes
@@ -54,12 +53,13 @@
 - name: symbolic link check
   stat:
     path: /etc/apache2/sites-enabled/cacti.conf
-  register: s
+  register: sym
 
 - name: create symbleic_link cacti.conf
   command:
     cmd: "ln -s /etc/apache2/sites-available/cacti.conf /etc/apache2/sites-enabled/cacti.conf"
-
+  when: sym.stat.islnk is undefined
+  
 - name: Restart service apache2
   ansible.builtin.systemd:
     name: apache2.service
