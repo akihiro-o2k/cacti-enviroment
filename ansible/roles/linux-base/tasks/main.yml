@@ -23,12 +23,6 @@
     mode: 0644
   when: stage == "production"
 
-- name: install libproxy-tools
-  apt:
-    name:
-      - libproxy-tools
-  when: stage == 'production'
-
 - name: create ~/wgetrc
   become: yes
   template:
@@ -57,6 +51,14 @@
       - software-properties-common
       - apt-transport-https
 
+- name: install libproxy-tools
+  become: yes
+  apt:
+    name:
+      - libproxy-tools
+  when: stage == 'production'
+
+
 # provisoning /etc/hosts
 - name: update /etc/hosts
   become: yes
@@ -75,13 +77,15 @@
   when: stage == 'production'
 
 # 商用環境のsystemd-timesyncdがmaskされている問題の別対処。
-#- name: install systemd-timesyncd
-#  ansible.builtin.apt:
-#    name: systemd-timesyncd
-#    state: latest
-#    update_cache: yes
+- name: install systemd-timesyncd
+  become: yes
+  ansible.builtin.apt:
+    name: systemd-timesyncd
+    state: latest
+    update_cache: yes
 
 - name: Start service systemd-timesyncd, , in all cases
+  become: yes
   ansible.builtin.service:
     name: systemd-timesyncd
     state: restarted
@@ -145,6 +149,7 @@
   with_items: "{{ admin_user }}"
 
 - name: root passwd change
+  become: yes
   user:
     name: root
     password:  "{{ root_passwd | password_hash('sha512') }}"
