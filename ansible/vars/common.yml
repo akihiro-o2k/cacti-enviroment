@@ -76,7 +76,7 @@
 # mariadb.conf
 - character_set_server: utf8mb4
 - collation_server: utf8mb4_unicode_ci
-- innodb_buffer_pool_size: '1G'
+#- innodb_buffer_pool_size: '1G'
 #- max_heap_table_size: '60.95M'
 #- tmp_table_size: '60.95M'
 #- max_heap_table_size: 70000000
