@@ -19,5 +19,8 @@
 - use_proxy: no
 - proxy_env:
 
+- php_memory_limit: 400M
+- max_heap_table_size: 69999616
+- tmp_table_size: 70000000
 - cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz'
 

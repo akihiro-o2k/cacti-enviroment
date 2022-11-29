@@ -68,13 +68,13 @@ describe '[8]php_config関連のテスト->' do
         it { should be_mode 644 }
         it { should be_owned_by 'root' }
         it { should be_grouped_into 'root' }
-        # TODO:max_execution_timeパラメータのみphp_config用テストメソッドでフック出来なかった為正規表件で確認。
+        # max_execution_timeパラメータのみphp_config用テストメソッドでフック出来なかった為正規表件で確認。
         its(:content) { should match /max_execution_time = #{COMMON['php_max_execution_time']}/ }
         its(:content) { should match /^php_error_reporting = #{COMMON['php_error_reporting']}/ }
       end
-      # TODO:各種PHP設定パラメータの妥当性確認及び、不足があれば外部パラメータ化してserverspec/ansibleへ反映。
+      # 各種PHP設定パラメータの妥当性確認及び、不足があれば外部パラメータ化してserverspec/ansibleへ反映。
       context  php_config('memory_limit', conf) do
-        its(:value) { should eq COMMON['php_memory_limit'] }
+        its(:value) { should eq ENVIROMENT['php_memory_limit'] }
       end
       context  php_config('date.timezone', conf) do
         its(:value) { should eq COMMON['time_zone'] }

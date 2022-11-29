@@ -25,7 +25,9 @@
 - use_proxy: yes
 - proxy_env: 
   - "http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}"
-
+- php_memory_limit: 1G
+- max_heap_table_size: 299999448
+- tmp_table_size: 300000000
 - cacti_download_url: /tmp/cacti-1.2.22.tar.gz
 - falcon_sensor_deb: /tmp/falcon-sensor_6.41.0-13804_amd64.deb
 - falcon_sensor_cid: DEC89C11D0A545DEBB1E48F901993CED-38

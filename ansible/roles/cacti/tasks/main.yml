@@ -24,9 +24,9 @@
     dest: /var/www
     owner: www-data 
     group: www-data
-    mode: 0755
+    mode: 0775
     remote_src: yes
-  when: d.stat.isdir == False
+  when: d.stat.exists != true
 
 - name: unarchive_dir_check
   stat:
@@ -37,7 +37,7 @@
 - name: directory_name chenge
   command:
     cmd: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
-  when: u.stat.isdir == true and d.stat.isdir == False
+  when: u.stat.isdir == true
 
 
 - name: create a new virtual host file for the Cacti site

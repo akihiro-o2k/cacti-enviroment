@@ -9,7 +9,7 @@
   tags:
     - linux-base
 
-- hosts: cacti01
+- hosts: cacti
   vars_files:
     - vars/{{ stage }}.yml
     - vars/common.yml
@@ -24,19 +24,4 @@
     - db
     - cacti
     - spine
-    - edm
-- hosts: cacti02
-  vars_files:
-    - vars/{{ stage }}.yml
-    - vars/common.yml
-  roles:
-    - httpd
-    - db
-    - cacti
-    - spin
-    - edm
-  tags:
-    - httpd
-    - db
-    - cacti
     - edm
