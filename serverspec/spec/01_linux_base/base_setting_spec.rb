@@ -73,13 +73,8 @@ describe "[6]:timezone設定値が'#{COMMON['time_zone']}'である事::" do
   end
 end
 
-describe "[7]EDRサーバとの連携が正常にできること::" do
-  pending
-end
-
-
 user = COMMON['admin_user'][0]
-describe "[8]OS管理用ユーザー'#{user['u_name']}'の設定確認::" do
+describe "[7]OS管理用ユーザー'#{user['u_name']}'の設定確認::" do
   describe user("#{user['u_name']}") do
     it { should exist }
     it { should belong_to_primary_group "#{user['u_name']}" }
@@ -89,7 +84,7 @@ describe "[8]OS管理用ユーザー'#{user['u_name']}'の設定確認::" do
   end
 end
 
-describe "[9]OS管理用ユーザー'#{user['u_name']}'のhome directory設定確認::" do
+describe "[8]OS管理用ユーザー'#{user['u_name']}'のhome directory設定確認::" do
   describe file("#{user['home']}") do
     it { should be_directory }
     it { should be_owned_by "#{user['u_name']}" }
