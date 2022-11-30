@@ -55,26 +55,3 @@ describe "[6] poller設定ファイル(/etc/cron.d/cacti)の確認::" do
   end
 end
 
-describe '[7]NXXXXXXが指定する、共通網、業務網内のNWノードをDevice登録し、SNMPによる情報取得ができること。（FW遮断などネットワーク要因の場合は除く）::' do
-  pending
-end
-
-describe '[8]登録したDeviceにおいて問題なくGraph設定が実施でき、グラフの描画が正常であること::' do
-  pending
-end
-
-describe '[9]Deviceの削除が問題なく実施できること::' do
-  pending
-end
-
-describe '[10]任意のUserを登録し、正常に登録完了すること::' do
-  pending
-end
-
-describe '[11]Userに設定したロールに関し、指定した権限以外の処理ができないこと::' do
-  pending
-end
-
-describe '[12]Userの削除が問題なく実施できること::' do
-  pending
-end
