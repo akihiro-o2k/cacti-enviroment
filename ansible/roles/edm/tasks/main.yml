@@ -13,7 +13,7 @@
   become: yes
   command:
     # cmd: /opt/CrowdStrike/falconctl -s --cid={{ falcon_sensor_cid }}
-    cmd: /opt/CrowdStrike/falconctl -s --cid={{ falcon_sensor_cid }} --aph=10.39.74.38 --app={{ proxy_port }}
+    cmd: /opt/CrowdStrike/falconctl -s --cid={{ falcon_sensor_cid }} --aph={{ proxy_server }} --app={{ proxy_port }} --apd=false
   when: result.stat.exists == false and stage == 'production'
 
 - name: falcon-sensor tag setting
