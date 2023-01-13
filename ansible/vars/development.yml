@@ -1,0 +1,28 @@
+---
+
+- server_hosts:
+   - "172.16.234.131  cacti01"
+   - "172.16.234.132  cacti02"
+   - "172.16.234.135  orion01"
+   - "172.16.234.136  orion02"
+   - "172.16.234.137  orion_db01"
+   - "172.16.234.138  orion_db02"
+
+- prompt: 32
+
+- ntp_servers:
+  - ntp.ubuntu.com
+
+#- dns:
+#  - "10.39.175.12 10.39.119.76"
+#
+- use_proxy: no
+- proxy_env:
+
+- php_memory_limit: 400M
+- max_heap_table_size: 69999616
+- tmp_table_size: 70000000
+- innodb_buffer_pool_size: 1G
+- join_buffer_size: 248.82MB
+- cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz'
+

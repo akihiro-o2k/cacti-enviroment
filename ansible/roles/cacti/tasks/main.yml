@@ -1,0 +1,101 @@
+---
+
+- name: install cacti native dependency package
+  apt:
+    name:
+      "{{ native_packages }}"
+
+- name: directory check
+  stat:
+    path: "{{ cacti_root_path  }}"
+  register: d
+
+- name: debug d
+  debug:
+    msg: "skip skip skip"
+    msg: "{{ d }}"
+  when:
+    - d.stat.exists == true
+    - d.stat.isdir == true
+
+- name: download & unzip cacti.tar.gz
+  ansible.builtin.unarchive:
+    src: "{{ cacti_download_url }}"
+    dest: /var/www
+    owner: www-data 
+    group: www-data
+    mode: 0775
+    remote_src: yes
+  when: d.stat.exists != true
+
+- name: unarchive_dir_check
+  stat:
+    path: "{{ cacti_unarchive_path }}"
+  register: u
+
+
+- name: directory_name chenge
+  command:
+    cmd: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
+  when: u.stat.isdir == true
+
+
+- name: create a new virtual host file for the Cacti site
+  become: yes
+  template:
+    src: etc/apache2/sites-available/cacti.conf.j2
+    dest: /etc/apache2/sites-available/cacti.conf
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+
+- name: symbolic link check
+  stat:
+    path: /etc/apache2/sites-enabled/cacti.conf
+  register: sym
+
+- name: create symbleic_link cacti.conf
+  command:
+    cmd: "ln -s /etc/apache2/sites-available/cacti.conf /etc/apache2/sites-enabled/cacti.conf"
+  when: sym.stat.islnk is undefined
+  
+- name: Restart service apache2
+  ansible.builtin.systemd:
+    name: apache2.service
+    state: restarted
+
+- name: create cacti config.php
+  become: yes
+  template:
+    src: var/www/cacti/include/config.php.j2
+    dest: /var/www/cacti/include/config.php
+    backup: true
+    owner: www-data
+    group: www-data
+    mode: 0755
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Upgrade the OS (apt-get dist-upgrade)
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: append wwwdata group
+  become: yes
+  command:
+    cmd: "usermod -aG www-data {{ item }}"
+  with_items:
+    - develop
+    - visualize
+
+- name: create /etc/cron.d/cacti (poller setting)
+  become: yes
+  template:
+    src: cacti
+    dest: /etc/cron.d/cacti
+    owner: root
+    group: root
+    mode: 0644

@@ -1,0 +1,136 @@
+---
+
+# Apache2.4のインストール
+- name: Install Apache2
+  become: yes
+  apt: pkg=apache2 state=latest
+
+# Apache2.confの入れ替え
+- name: create /etc/apache2/apache2.conf
+  template:
+    src: etc/apache2/apache2.conf.j2
+    dest: /etc/apache2/apache2.conf
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+
+# sites-available/000-defaule.confの入れ替え
+# TODO: ServerAdminのメールアドレスをPJの連絡先MLに変更
+- name: create /etc/apache2/sites-available/000-default.conf
+  template:
+    src:  etc/apache2/sites-available/000-default.conf
+    dest: /etc/apache2/sites-available/000-default.conf
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+
+# apache2設定ファイルの正常性確認(エラーで後工程は停止)
+- name: apache2 configtest
+  command: apache2ctl configtest
+  register: a2_result
+  ignore_errors: no
+
+# configチェック結果表示
+- name: view apache2ctl configtest
+  debug:
+    var: a2_result
+
+# Apache2へconfig適用(reload)
+#- name: Reload Apache2
+#  become: yes
+#  service: name=apache2 state=reloaded
+- name: Restart service apache2, in all cases
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+
+
+# 起動時有効化設定
+- name: http service state
+  become: yes
+  service:
+    name: apache2
+    state: started
+    enabled: yes
+
+# ->Ubuntu20でインストールできるphpは7.4の為、リポジトリを追加
+- name: Installs the ppa:ondrej/php repo on Ubuntu systems
+  apt_repository:
+    repo: ppa:ondrej/php
+    update_cache: true
+  when: stage == 'development'
+
+# 商用環境でapt_repositoryが通らない問題への対処
+# 手動でppa:ondrej/phpのGPGKEYを追加。ppa_ondrej.key
+# https://launchpad.net/~ondrej/+archive/ubuntu/php
+- name: uplaod ppa:ondrej/php  Key file
+  template:
+    src:  tmp/ppa_ondrej.key
+    dest: /tmp/ppa_ondrej.key
+    owner: root
+    group: root
+    mode: 0644
+  when: stage == 'production'
+
+- name: add ppa:ondrej apt-key
+  ansible.builtin.apt_key:
+    file: /tmp/ppa_ondrej.key
+    state: present
+  when: stage == 'production'
+
+
+# 商用環境でapt_repositoryが通らない問題への対処
+# 手動で/etc/apt/sources.listにリポジトリを追加
+- name: Add ppa:ondrej/php Repository
+  apt_repository:
+    repo: "deb https://ppa.launchpadcontent.net/ondrej/php/ubuntu focal main"
+    state: present
+    filename: ppa_ondrej_php
+  when: stage == 'production'
+
+# php8.0以降のパッケージをインストールする為にaptリポジトリの更新
+- name: Apt update
+  become: yes
+  apt:
+    update_cache: yes
+
+# php.versionをインストール
+- name: Install php and modules
+  become: yes
+  apt:
+    name:
+      "{{ php_packages }}"
+
+- name: create php.ini
+  template:
+    src:  "{{ item.template_path }}"
+    dest: "{{ item.path }}"
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ php_ini }}"
+
+# Module追加後にapache2のリロード
+- name: Reload service apache2, in all cases
+  ansible.builtin.systemd:
+    name: apache2.service
+    state: reloaded
+
+# ログファイル退避用ディレクトリ作成
+# todo: 外部ストレージが利用可能段階で修正が必要
+- name: mkdir /mnt/storate01
+  become: yes
+  command:
+    cmd: "mkdir -p /mnt/storate01/{{ansible_hostname}}/apache2"
+
+# logrotate後のpostrotateで使用するスクリプトhttpd-prerotateのアップロード 
+- name: create /etc/logrotate.d/httpd-prerotate
+  template:
+    src: etc/logrotate.d/httpd-prerotate
+    dest: /etc/logrotate.d/httpd-prerotate
+    owner: root
+    group: root
+    mode: 0644

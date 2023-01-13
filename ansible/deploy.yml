@@ -1,0 +1,27 @@
+---
+
+- hosts: all
+  vars_files:
+    - vars/{{ stage }}.yml
+    - vars/common.yml
+  roles:
+    - linux-base
+  tags:
+    - linux-base
+
+- hosts: cacti
+  vars_files:
+    - vars/{{ stage }}.yml
+    - vars/common.yml
+  roles:
+    - httpd
+    - db
+    - cacti
+    - spine
+    - edm
+  tags:
+    - httpd
+    - db
+    - cacti
+    - spine
+    - edm

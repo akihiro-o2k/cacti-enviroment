@@ -1,0 +1,34 @@
+- name: check bin file
+  stat:
+    path: "/opt/CrowdStrike/falconctl"
+  register: result
+
+- name: install falcon-sensor
+  become: yes
+  command:
+    cmd: dpkg -i {{ falcon_sensor_deb }}
+  when: result.stat.exists == false and stage == 'production'
+
+- name: cid and proxy setting
+  become: yes
+  command:
+    # cmd: /opt/CrowdStrike/falconctl -s --cid={{ falcon_sensor_cid }}
+    cmd: /opt/CrowdStrike/falconctl -s --cid={{ falcon_sensor_cid }} --aph={{ proxy_server }} --app={{ proxy_port }} --apd=false
+  when: result.stat.exists == false and stage == 'production'
+
+- name: falcon-sensor tag setting
+  command: /opt/CrowdStrike/falconctl -s --tags={{ falcon_sensor_tag }}
+  when: result.stat.exists == false and stage == 'production'
+
+- name: start falcon-sensor
+  systemd:
+    state: started
+    name: falcon-sensor
+  when: stage == 'production'
+
+- name: copy logrotate file for falcon-sensor
+  template:
+    src: falcon-sensor.j2
+    dest: /etc/logrotate.d/falcon-sensor
+  register: copy_result
+  when: stage == 'production'
