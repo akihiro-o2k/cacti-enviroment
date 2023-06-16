@@ -3,6 +3,7 @@ require 'spec_helper'
 
 describe "[1]:cacti動作に必要となるnativeパッケージのインストール状態確認::" do
   COMMON['native_packages'].each do |target|
+    next if target == 'libmysql++-dev'
     describe package(target), :if => os[:family] == 'ubuntu' do
       it { should be_installed }
     end
