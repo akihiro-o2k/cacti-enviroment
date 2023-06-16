@@ -22,7 +22,6 @@
   - snmp-mibs-downloader
   - software-properties-common
   - git
-  - smbclient
 
 - spine_packages:
   - build-essential
