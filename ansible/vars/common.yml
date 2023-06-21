@@ -28,24 +28,24 @@
   - build-essential
 
 - php_packages:
-  - php8.1
-  - libapache2-mod-php8.1
-  - php8.1-cli
-  - php8.1-snmp
-  - php8.1-mysql
-  - php8.1-mbstring
-  - php8.1-gd
-  - php8.1-xml
-  - php8.1-ldap
-  - php8.1-gmp
-  - php8.1-intl
-  - php8.1-pspell
-  - php8.1-memcache
+  - php8.2
+  - libapache2-mod-php8.2
+  - php8.2-cli
+  - php8.2-snmp
+  - php8.2-mysql
+  - php8.2-mbstring
+  - php8.2-gd
+  - php8.2-xml
+  - php8.2-ldap
+  - php8.2-gmp
+  - php8.2-intl
+  - php8.2-pspell
+  - php8.2-memcache
 
 # php.ini関連の変数及び、php設定パラメータ
 - php_ini:
-  - { path: /etc/php/8.1/cli/php.ini, template_path: etc/php/8.1/cli/php.ini.j2 }
-  - { path: /etc/php/8.1/apache2/php.ini, template_path: etc/php/8.1/apache2/php.ini.j2 }
+  - { path: /etc/php/8.2/cli/php.ini, template_path: etc/php/8.2/cli/php.ini.j2 }
+  - { path: /etc/php/8.2/apache2/php.ini, template_path: etc/php/8.2/apache2/php.ini.j2 }
 - php_max_execution_time: 300
   # 暫定->実行時のエラーのみ
 - php_error_reporting: 'E_ERROR | E_WARNING | E_PARSE'
@@ -54,7 +54,7 @@
 - time_zone: Asia/Tokyo
 
 # ansible-galaxy mahdi22.mariadb_installのパラメータ
-- mariadb_version: "10.8"
+- mariadb_version: "10.11"
 - bind-address: '127.0.0.1'
 - deny_remote_connections: true
 - mysql_root_password: "TrustNo1"
@@ -65,7 +65,7 @@
 - db_user_password: cactiuser
 # 独自改修箇所:ミラーサイトとバージョンを同一URIで変数渡し
 # ミラーサイトからパッケージが消失するケースあり。doc/use_of_ansible-galaxy.mdに該当するエラーメッセージ例と対処方法を記載。
-- mariadb_repo: 'deb https://atl.mirrors.knownhost.com/mariadb/repo/10.8/ubuntu'
+- mariadb_repo: 'deb https://atl.mirrors.knownhost.com/mariadb/repo/10.11/ubuntu'
 - import_sql_file: true
 - sql_file_name:
   - { db: 'cactidb', file: '01_criate_cacti_tables.sql' }
@@ -83,6 +83,6 @@
 #- max_heap_table_size: 69999616
 #- tmp_table_size: 70000000
 
-- cacti_unarchive_path: /var/www/cacti-1.2.22
+- cacti_unarchive_path: /var/www/cacti-1.2.24
 - cacti_root_path: /var/www/cacti
-- spine_version: '1.2.22'
+- spine_version: '1.2.24'
