@@ -24,5 +24,5 @@
 - tmp_table_size: 70000000
 - innodb_buffer_pool_size: 1G
 - join_buffer_size: 248.82MB
-- cacti_download_url: 'https://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz'
+- cacti_download_url: 'http://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz'
 

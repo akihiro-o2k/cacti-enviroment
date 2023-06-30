@@ -18,7 +18,8 @@
 # 商用はSCPで/tmpにアップロード
 - name: development get cacti-spine source file
   ansible.builtin.get_url:
-    url: "https://www.cacti.net/downloads/spine/cacti-spine-{{ spine_version }}.tar.gz"
+    url: "http://www.cacti.net/downloads/spine/cacti-spine-{{ spine_version }}.tar.gz"
+    validate_certs: no
     dest: /tmp
     mode: '0770'
   when: result1.stat.exists==false
