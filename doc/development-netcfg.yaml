@@ -1,0 +1,9 @@
+network:
+  ethernets:
+    ens33:
+      addresses: [172.16.234.131/24]
+      gateway4: 172.16.234.2
+      nameservers:
+        addresses: [172.16.234.2]
+        search: []
+  version: 2
