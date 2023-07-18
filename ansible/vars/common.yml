@@ -22,7 +22,6 @@
   - snmp-mibs-downloader
   - software-properties-common
   - git
-  - zabbix-agent
 
 - spine_packages:
   - build-essential
