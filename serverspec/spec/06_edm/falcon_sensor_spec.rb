@@ -8,6 +8,7 @@ if ENV['ENVIROMENT'] == 'production'
   describe "[2]falcon-sensorの動作確認::" do
     describe process("falcon-sensor") do
       it { should be_running }
+      it { should be_enabled }
     end
   end
   describe "[3]falcon-sensorのlogrotate設定の確認::" do

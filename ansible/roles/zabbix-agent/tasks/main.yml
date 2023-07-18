@@ -1,0 +1,33 @@
+- name: check bin file
+  stat:
+    path: "/usr/shere/zabbix-agent"
+  register: result
+
+- name: install zabbix-agent
+  become: yes
+  apt: zabbix-agent=1:4.0.17+dfsg-1
+  when: result.stat.exists == false and stage == 'production'
+
+- name: create /etc/zabbix/zabbix-agentd.conf
+  template:
+    src: etc/zabbix/zabbix-agentd.conf.j2
+    dest: /etc/zabbix/zabbix-agentd.conf
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+  when: result.stat.exists == false and stage == 'production'
+
+- name: start zabbix-agent
+  systemd:
+    state: started
+    name: zabbix-agent
+  when: stage == 'production'
+
+- name: zabbix-agent service state
+  become: yes
+  service:
+    name: zabbix-agent
+    state: started
+    enabled: yes
+  when: result.stat.exists == false and stage == 'production'
