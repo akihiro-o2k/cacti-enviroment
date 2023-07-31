@@ -1,0 +1,62 @@
+---
+
+- name: image directory check
+  stat:
+    path: "{{ image_directory }}"
+  register: d
+
+- name: create images directory
+  ansible.builtin.file:
+    path: "{{ image_directory }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: 0775
+  when:
+    - d.stat.exists != true
+    - d.stat.isdir != true
+
+
+- name: backlog directory check
+  stat:
+    path: "{{ backlog_directory }}"
+  register: d
+
+- name: create backlog directory
+  ansible.builtin.file:
+    path: "{{ backlog_directory }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: 0775
+  when:
+    - d.stat.exists != true
+    - d.stat.isdir != true
+
+
+- name: create a new virtual host file for the images site
+  become: yes
+  template:
+    src: etc/apache2/sites-available/images.conf.j2
+    dest: /etc/apache2/sites-available/images.conf
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+
+- name: symbolic link check
+  stat:
+    path: /etc/apache2/sites-enabled/images.conf
+  register: sym
+
+- name: create symbleic_link cacti.conf
+  command:
+    cmd: "ln -s /etc/apache2/sites-available/images.conf /etc/apache2/sites-enabled/images.conf"
+  when: sym.stat.islnk is undefined
+
+  
+- name: Restart service apache2
+  ansible.builtin.systemd:
+    name: apache2.service
+    state: restarted
+
