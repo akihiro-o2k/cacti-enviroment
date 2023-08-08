@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>ScreenShot exec script Failed!!</title>
+</head>
+
+<body>
+  <h1>ScreenShot script is Failed!!</h1>
+  <p>この画像はプログラム処理で自動取得を行なっている<a href="./lastest.png">最新MAP画像</a>取得処理が失敗した際に表示される画像です。
+  </p>
+  <h3>想定されるエラーの要因は下記の通りです。</h3>
+  <ol>
+    <li>リクエスト対象URLのサーバーに負荷が掛かっており処理がTimeOutしてしまった。</li>
+    <li>リクエスト対象URLのサーバーのコンテンツへのログイン・MAP描画処理がサーバービジー状態でスタックしてしまった。</li>
+    <li>リクエスト対象URLリクエストを投げた際のhttp responseでのstatus codeが200以外の失敗を戻している。</li>
+    <li>リクエスト対象URLのサーバーが定期メンテナンス等で停止している。</li>
+    <li>プラットフォーム側の障害又はメンテナンス工事でアクセス不可能</li>
+    <li>その他、想定外事象</li>
+  </ol>
+  <p>最新MAP画像取得処理エラー時の運用対処方法:</p>
+  <ul>
+    <li>直近のMAP参照で問題ないケースの場合、<a href="./backlog/">過去のスクリーンショットフォルダ</a>より、任意の日付フォルダ・時刻ファイルのクリックで確認可能です。
+    </li>
+    <li>上記1−3のケースでは時間を置いて再度アクセスして頂ければ、再実行されたスクリプトで正常化取得した画像が確認可能です。</li>
+    <li>一定時間経過後も復旧が確認できない場合、恐れ入りますが"社内網可視化ツール群管理主管"までメールにてご連絡ください。</li>
+    <ul>
+      <li>管理主管ML: <a href="mail://nwmieruka-is2g-dx@ntt.com">nwmieruka-is2g-dx@ntt.com</a></li>
+    </ul>
+  </ul>
+</body>
+
+</html>

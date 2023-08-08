@@ -53,8 +53,17 @@
   command:
     cmd: "ln -s /etc/apache2/sites-available/images.conf /etc/apache2/sites-enabled/images.conf"
   when: sym.stat.islnk is undefined
-
   
+- name: upload error.html
+  become: yes
+  template:
+    src: var/www/images/error.html
+    dest: /var/www/images/error.html
+    backup: true
+    owner: www-data
+    group: www-data
+    mode: 0644
+
 - name: Restart service apache2
   ansible.builtin.systemd:
     name: apache2.service
