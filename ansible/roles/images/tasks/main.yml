@@ -2,19 +2,18 @@
 
 - name: image directory check
   stat:
-    path: "{{ image_directory }}"
+    path: "{{ images_directory }}"
   register: d
 
 - name: create images directory
   ansible.builtin.file:
-    path: "{{ image_directory }}"
+    path: "{{ images_directory }}"
     state: directory
     owner: www-data
     group: www-data
     mode: 0775
   when:
-    - d.stat.exists != true
-    - d.stat.isdir != true
+    - d.stat.exists == false
 
 
 - name: backlog directory check
@@ -31,7 +30,6 @@
     mode: 0775
   when:
     - d.stat.exists != true
-    - d.stat.isdir != true
 
 
 - name: create a new virtual host file for the images site
