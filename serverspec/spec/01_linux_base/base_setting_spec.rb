@@ -26,7 +26,7 @@ end
 
 # test /etc/hosts
 describe "[3]:/etc/hosts関連設定の確認" do
-  hosts = %w(cacti01 cacti02 orion01 orion02 orion_db01 orion_db02)
+  hosts = %w(cacti01 cacti02 orion01 orion02 orion_db01 cacti03)
   describe file('/etc/hosts') do
     it { should be_file }
     describe '名前解決用に各種サーバー名が定義されている事::' do

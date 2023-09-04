@@ -6,8 +6,8 @@ describe '[1]mariadb-serverパッケージがインストールされている�
   end
 end
 describe "[2]指定バージョン'#{COMMON['mariadb_version']}'でインストールされている事::" do
-  describe command("apt list --installed | grep mariadb-server-#{COMMON['mariadb_version']}") do
-    its(:stdout)  { should match /^mariadb-server-10.8\// }
+  describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} --version") do
+    its(:stdout)  { should match /10.11.5-MariaDB/ }
   end
 end
 describe '[3]systemd関連:mariadbの起動と再起動時の動作を確認::' do

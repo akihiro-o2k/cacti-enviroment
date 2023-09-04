@@ -18,8 +18,8 @@ describe "[2]spineパッケージ解凍ファイル郡の存在確認::" do
 end
 describe "[3]spine実行ファイルの確認::" do
   describe file('/usr/local/spine/bin/spine') do
-    it { should be_directory }
-    it { should be_mode 4755 }
+    it { should be_file }
+    it { should be_mode 2751 }
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
   end
