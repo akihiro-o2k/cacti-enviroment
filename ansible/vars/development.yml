@@ -6,7 +6,7 @@
    - "172.16.234.135  orion01"
    - "172.16.234.136  orion02"
    - "172.16.234.137  orion_db01"
-   - "172.16.234.138  orion_db02"
+   - "172.16.234.133  cacti03"
 
 - prompt: 32
 
@@ -24,5 +24,5 @@
 - tmp_table_size: 70000000
 - innodb_buffer_pool_size: 1G
 - join_buffer_size: 248.82MB
-- cacti_download_url: 'http://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz'
+- cacti_download_url: 'http://files.cacti.net/cacti/linux/cacti-1.2.24.tar.gz'
 

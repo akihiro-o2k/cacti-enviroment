@@ -37,7 +37,9 @@
 - name: directory_name chenge
   command:
     cmd: "mv {{ cacti_unarchive_path }} {{ cacti_root_path  }}"
-  when: u.stat.isdir == true
+  when:
+    - u.stat.exists == true
+    - u.stat.isdir == true
 
 
 - name: create a new virtual host file for the Cacti site
