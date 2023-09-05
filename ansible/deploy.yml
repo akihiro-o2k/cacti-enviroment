@@ -19,9 +19,13 @@
     - cacti
     - spine
     - edm
+    - zabbix-agent
+    - images
   tags:
     - httpd
     - db
     - cacti
     - spine
     - edm
+    - zabbix-agent
+    - images

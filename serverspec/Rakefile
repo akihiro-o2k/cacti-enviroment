@@ -2,7 +2,7 @@ require 'rake'
 require 'rspec/core/rake_task'
 
 # cacti配列にテスト対象を定義
-cacti=%w(01_linux_base 02_httpd 03_db 04_cacti)
+cacti=%w(01_linux_base 02_httpd 03_db 04_cacti 05_spine  06_edm  07_zabbix-agent  08_images)
 #cacti=%w(linux-base httpd)
 
 # hostnameはserverspec実行端末の/etc/hostsで解決する方式で、開発環境／検証環境／商用環境の共有を図る。
@@ -13,6 +13,10 @@ hosts = [
   },
   {
     :name  => 'cacti02',
+    :roles => cacti,
+  },
+  {
+    :name  => 'cacti03',
     :roles => cacti,
   },
 ]
