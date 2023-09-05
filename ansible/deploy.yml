@@ -14,8 +14,8 @@
     - vars/{{ stage }}.yml
     - vars/common.yml
   roles:
-    #- httpd
-    #- db
+    - httpd
+    - db
     - cacti
     - spine
     - edm
