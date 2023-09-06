@@ -16,7 +16,6 @@
     mode: 0644
 
 # sites-available/000-defaule.confの入れ替え
-# TODO: ServerAdminのメールアドレスをPJの連絡先MLに変更
 - name: create /etc/apache2/sites-available/000-default.conf
   template:
     src:  etc/apache2/sites-available/000-default.conf
@@ -55,13 +54,6 @@
     state: started
     enabled: yes
 
-# ->Ubuntu20でインストールできるphpは7.4の為、リポジトリを追加
-- name: Installs the ppa:ondrej/php repo on Ubuntu systems
-  apt_repository:
-    repo: ppa:ondrej/php
-    update_cache: true
-  when: stage == 'development'
-
 # 商用環境でapt_repositoryが通らない問題への対処
 # 手動でppa:ondrej/phpのGPGKEYを追加。ppa_ondrej.key
 # https://launchpad.net/~ondrej/+archive/ubuntu/php
@@ -72,13 +64,11 @@
     owner: root
     group: root
     mode: 0644
-  when: stage == 'production'
 
 - name: add ppa:ondrej apt-key
   ansible.builtin.apt_key:
     file: /tmp/ppa_ondrej.key
     state: present
-  when: stage == 'production'
 
 
 # 商用環境でapt_repositoryが通らない問題への対処
@@ -88,7 +78,6 @@
     repo: "deb https://ppa.launchpadcontent.net/ondrej/php/ubuntu focal main"
     state: present
     filename: ppa_ondrej_php
-  when: stage == 'production'
 
 # php8.0以降のパッケージをインストールする為にaptリポジトリの更新
 - name: Apt update
