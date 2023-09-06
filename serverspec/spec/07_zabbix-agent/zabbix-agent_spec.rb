@@ -6,14 +6,14 @@ if ENV['ENVIROMENT'] == 'production'
     end
   end
   describe "[2]zabbix-agentの動作確認::" do
-    describe process("zabbix-agent") do
+    describe service("zabbix-agent"), :if => os[:family] == 'ubuntu' do
       it { should be_running }
       it { should be_enabled }
     end
   end
-  describe "[3]zabbix-agentd.conf設定の確認::" do
+  describe "[3]zabbix_agentd.conf設定の確認::" do
     accept = "Hostname=#{host_inventory['hostname']}"
-    describe file('/etc/zabbix/zabbix-agentd.conf') do
+    describe file('/etc/zabbix/zabbix_agentd.conf') do
       it { should be_file }
       it { should be_mode 644 }
       it { should be_owned_by 'root' }

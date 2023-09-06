@@ -5,13 +5,14 @@
 
 - name: install zabbix-agent
   become: yes
-  apt: zabbix-agent=1:4.0.17+dfsg-1
+  apt:
+    name: zabbix-agent=1:4.0.17+dfsg-1
   when: result.stat.exists == false and stage == 'production'
 
 - name: create /etc/zabbix/zabbix-agentd.conf
   template:
-    src: etc/zabbix/zabbix-agentd.conf.j2
-    dest: /etc/zabbix/zabbix-agentd.conf
+    src: etc/zabbix/zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
     backup: true
     owner: root
     group: root
