@@ -73,11 +73,9 @@
   - { db: 'cactidb', file: '04_alter_database_set_utfmb4.sql' }
 
 # mariadb.conf
+# このほかのパラメータはvars/${ENVIROMENT}.yml側に定義
 - character_set_server: utf8mb4
 - collation_server: utf8mb4_unicode_ci
-- innodb_buffer_pool_size: 1G
-- max_heap_table_size: 69999616
-- tmp_table_size: 70000000
 
 - cacti_unarchive_path: /var/www/cacti-1.2.24
 - cacti_root_path: /var/www/cacti

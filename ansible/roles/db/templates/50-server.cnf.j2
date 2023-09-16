@@ -101,7 +101,6 @@ collation-server      = {{ collation_server  }}
 #innodb_buffer_pool_size = 8G
 innodb_file_format = Barracuda
 innodb_large_prefix = 1
-innodb_buffer_pool_size = {{ innodb_buffer_pool_size }}
 innodb_flush_log_at_timeout = 3
 innodb_read_io_threads = 32
 innodb_write_io_threads = 16
@@ -109,11 +108,13 @@ innodb_io_capacity = 5000
 innodb_io_capacity_max = 10000
 innodb_buffer_pool_instances=9
 innodb_doublewrite=OFF
-join_buffer_size=10M
+read_buffer_size = 100000
+# get 'enviroment' setting
+innodb_buffer_pool_size = {{ innodb_buffer_pool_size }}
 max_heap_table_size = {{ max_heap_table_size }}
 tmp_table_size = {{ tmp_table_size }}
-read_buffer_size = 100000
-sort_buffer_size = 1M
+join_buffer_size= {{ join_buffer_size }}
+sort_buffer_size = {{ sort_buffer_size }} 
 # this is only for embedded server
 [embedded]
 
