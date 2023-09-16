@@ -26,10 +26,11 @@
 - proxy_env: 
   - "http://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_server }}:{{ proxy_port }}"
 - php_memory_limit: 1G
+- innodb_buffer_pool_size: 2G
 - max_heap_table_size: 300000000
 - tmp_table_size: 300000000
-- innodb_buffer_pool_size: 2G
-- join_buffer_size: 400MB
+- join_buffer_size: 24MB
+- sort_buffer_size: 2M
 - cacti_download_url: /tmp/cacti-1.2.24.tar.gz
 - falcon_sensor_deb: /tmp/falcon-sensor_6.41.0-13804_amd64.deb
 - falcon_sensor_cid: DEC89C11D0A545DEBB1E48F901993CED-38
