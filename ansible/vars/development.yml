@@ -23,7 +23,7 @@
 - innodb_buffer_pool_size: 1G
 - max_heap_table_size: 69999616
 - tmp_table_size: 70000000
-- join_buffer_size: 24MB
-- sort_buffer_size: 2M 
+- join_buffer_size: 9MB
+- sort_buffer_size: 1M 
 - cacti_download_url: 'http://files.cacti.net/cacti/linux/cacti-1.2.24.tar.gz'
 
