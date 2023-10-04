@@ -7,7 +7,7 @@
 
 - name: result1-check cacti-spine.tar.gz exists?
   stat:
-    path: "/tmp/cacti-spine-{{ spine_version }}.tar.gz"
+    path: "/usr/local/packages/cacti-spine-{{ spine_version }}.tar.gz"
   register: result1
   ignore_errors: yes
   
@@ -25,6 +25,15 @@
   when: result1.stat.exists==false
     and stage == 'development'
 
+- name: upload spain package for production 
+  ansible.builtin.unarchive:
+    src: "/usr/local/packages/cacti-spine-{{ spine_version }}.tar.gz"
+    dest: /tmp/
+    owner: www-data
+    group: www-data
+    mode: 0775
+  when: stage == 'production'
+  
 - name: result2-check cacti-spine.tar.gz exists?
   stat:
     path: "/tmp/cacti-spine-{{ spine_version }}.tar.gz"
