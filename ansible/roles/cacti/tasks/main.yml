@@ -25,7 +25,6 @@
     owner: www-data 
     group: www-data
     mode: 0775
-    remote_src: yes
   when: d.stat.exists != true
 
 - name: unarchive_dir_check
