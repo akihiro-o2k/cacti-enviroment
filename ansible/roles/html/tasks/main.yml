@@ -24,4 +24,4 @@
     owner: www-data
     group: www-data
     remote_src: yes
-    mode: 0644
+    mode: 0755
