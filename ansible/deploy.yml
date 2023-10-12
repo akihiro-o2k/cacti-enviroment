@@ -21,6 +21,7 @@
     - edm
     - zabbix-agent
     - images
+    - html
   tags:
     - httpd
     - db
@@ -29,3 +30,4 @@
     - edm
     - zabbix-agent
     - images
+    - html

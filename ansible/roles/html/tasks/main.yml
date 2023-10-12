@@ -1,0 +1,25 @@
+---
+
+
+- name: tm-cacti.tgz exists?
+  stat:
+    path: "/tmp/tm-cacti.tgz"
+  register: result1
+  ignore_errors: yes
+  
+- name: upload tm-cacti.tgz
+  ansible.builtin.copy:
+    src: "tm-cacti.tgz"
+    dest: /tmp/
+    owner: www-data
+    group: www-data
+    mode: '0770'
+  when: result1.stat.exists==false
+
+- name: unarchive tm-cactai.tgz 
+  ansible.builtin.unarchive:
+    src: "/tmp/tm-cacti.tgz"
+    dest: /var/www/html/
+    owner: www-data
+    group: www-data
+    mode: 0755
