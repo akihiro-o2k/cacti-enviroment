@@ -4,11 +4,11 @@
   register: result
 
 - name: upload spain package for production
-  ansible.builtin.unarchive:
+  ansible.builtin.copy:
     src: {{ falcon_sensor_src  }}
     dest: /tmp/
-    owner: www-data
-    group: www-data
+    owner: develop
+    group: develop
     mode: 0775
   when: stage == 'production'
 
