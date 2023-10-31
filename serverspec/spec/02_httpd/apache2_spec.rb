@@ -35,6 +35,8 @@ describe "[5]/etc/apache2/apache2.confの設定内容を正規表現フックで
     # 独自設定箇所
     its(:content) { should match /#{accept}/ }
     its(:content) { should match /ErrorLog \${APACHE_LOG_DIR}\/error.log/ }
+    its(:content) { should match /ServerTokens ProductOnly/ }
+    its(:content) { should match /ServerSignature off/ }
   end
 end
 
