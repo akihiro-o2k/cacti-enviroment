@@ -229,3 +229,7 @@ IncludeOptional sites-enabled/*.conf
 
 # systemdでのservice操作時及びapache2ctlコマンドでのservername未設定警告への対処->ホスト名で登録する。
 ServerName {{ansible_hostname}}
+
+# 標準催促要件 OS名とApacheバージョンの隠蔽を行う事。
+ServerTokens ProductOnly
+ServerSignature off
