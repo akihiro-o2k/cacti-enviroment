@@ -8,7 +8,7 @@
     dest: /etc/profile.d/proxy_setting.sh
     owner: root
     group: root
-    mode: 777
+    mode: 0755
   # 適用すべき環境はstageを参照して切り替え
   when: stage == 'production'
 
@@ -30,7 +30,7 @@
     dest: /home/develop/.wgetrc
     owner: develop
     group: develop
-    mode: 644
+    mode: 0644
   when: stage == "production"
 
 # proxy設定後にaptを更新

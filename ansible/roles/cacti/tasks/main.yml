@@ -12,7 +12,6 @@
 
 - name: debug d
   debug:
-    msg: "skip skip skip"
     msg: "{{ d }}"
   when:
     - d.stat.exists == true
