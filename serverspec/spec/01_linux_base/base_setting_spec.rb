@@ -7,21 +7,14 @@ describe "[1]:OS のバージョンは Ubuntu 20.04 であることを確認す�
   end
 end
 describe "[2]:/etc/profile.d/proxy_setting.shの存在確認::" do
-# Proxy申請を行った結果不要となった。
-=begin
   describe file('/etc/profile.d/proxy_setting.sh') do
     if ENV['ENVIROMENT']!='development' then
       it { should be_file }
-      it { should be_mode 711 }
+      it { should be_mode 755 }
       it { should be_owned_by 'root' }
       it { should be_grouped_into 'root' }
-    else
-      context '開発環境ではproxyを使用しない為、ファイルは存在しない' do
-        it { should_not be_file }
-      end
     end
   end
-=end
 end
 
 # test /etc/hosts

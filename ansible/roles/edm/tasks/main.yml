@@ -5,7 +5,7 @@
 
 - name: upload spain package for production
   ansible.builtin.copy:
-    src: {{ falcon_sensor_src  }}
+    src: "{{ falcon_sensor_src }}"
     dest: /tmp/
     owner: develop
     group: develop
