@@ -109,8 +109,8 @@
   - Cactiの動作に必要となるミドルウェアを「[設計へのインプットとなる要件、及び、関連文書・仕様](#設計へのインプットとなる文書・及び仕様)」で定義の文書に照らし合わせ、標準利用可能なミドルウェア・バージョンを選定する。
 - 必須ミドルウェア(初期構築時のバージョン[^0])
     1. Apache(2.4.x)
-    1. ~~php(8.1)~~　php(8.2)
-    1. ~~mariadb(10.8)~~ mariadb(10.11)
+    1. ~~php(8.1) php(8.2)~~ php(8.3)
+    1. ~~mariadb(10.8) mariadb(10.11)~~ mariadb(11.4)
 
 - アプリケーション導入に付随して導入するネイティブパッケージ[^1]
   - ppa:ondrej/php
@@ -149,7 +149,7 @@
 
 #### 動作環境
 
-- サーバーOS: Ubuntu 20.04.4 LTS
+- サーバーOS: Ubuntu 22.04.4 LTS
 - サーバープロビジョニング方式
   - ansible [core 2.12.6]
     - python version = 3.8.10 (default, Mar 15 2022, 12:22:08) [GCC 9.4.0]
@@ -195,14 +195,18 @@
 
       ```yaml
       network:
+        version: 2
+        renderer: networkd
         ethernets:
           ens33:
-            addresses: [10.223.164.110/27]
-            gateway4: 10.223.164.97
+            dhcp4: false
+            dhcp6: false
+            addresses: [10.223.164.112/27]
+            routes:
+              - to: default
+                via: 10.223.164.97
             nameservers:
-              addresses: [10.39.175.12,10.39.119.76]
-              search: []
-        version: 2
+              addresses: [10.39.175.12,10.39.119.76] 
       ```
   1. /etc/ssh/sshd_configの編集
       ```bash
