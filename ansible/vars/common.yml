@@ -22,9 +22,19 @@
   - snmp-mibs-downloader
   - software-properties-common
   - git
+  - update-alternatives
+  - python3-openssl
 
 - spine_packages:
   - build-essential
+  - automake
+  - gzip
+  - m4
+  - make
+  - wget
+  - libtool
+  - libmariadbclient-dev
+  - libssl-dev
 
 - php_packages:
   - php8.3
@@ -79,7 +89,7 @@
 
 - cacti_unarchive_path: /var/www/cacti-1.2.24
 - cacti_root_path: /var/www/cacti
-- spine_version: '1.2.24'
+- spine_version: '1.2.27'
 
 - images_directory: /var/www/images
 - backlog_directory: /var/www/images/backlog

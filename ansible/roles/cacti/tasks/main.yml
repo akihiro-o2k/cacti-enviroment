@@ -1,9 +1,9 @@
 ---
 
-- name: install cacti native dependency package
-  apt:
-    name:
-      "{{ native_packages }}"
+#- name: install cacti native dependency package
+#  apt:
+#    name:
+#      "{{ native_packages }}"
 
 - name: directory check
   stat:
