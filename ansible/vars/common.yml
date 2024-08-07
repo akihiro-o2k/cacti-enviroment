@@ -9,21 +9,15 @@
 
 - native_packages:
   - snmp
-  - snmpd
-  - rrdtool
   - libmysql++-dev
   - libsnmp-dev
   - help2man
-  - dos2unix
   - autoconf
-  - dh-autoreconf
   - libssl-dev
-  - librrds-perl
-  - snmp-mibs-downloader
   - software-properties-common
   - git
-  - update-alternatives
   - python3-openssl
+  - libmariadb-dev
 
 - spine_packages:
   - build-essential
@@ -33,10 +27,9 @@
   - make
   - wget
   - libtool
-  - libmariadbclient-dev
   - libnet-snmp-perl
   - libsnmp-dev
-
+ 
 - php_packages:
   - php8.3
   - libapache2-mod-php8.3
