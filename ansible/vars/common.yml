@@ -1,7 +1,7 @@
 ---
 
-- server_os: 'Ubuntu 20.04'
-
+- server_os: 'Ubuntu 22.04'
+- os_alias: 'jammy'
 - admin_user: 
   - { u_name: visualize, groups: 'lxd,sudo', pass: Visualize0033#, shell: /bin/bash, home: /home/visualize }
 
@@ -34,7 +34,8 @@
   - wget
   - libtool
   - libmariadbclient-dev
-  - libssl-dev
+  - libnet-snmp-perl
+  - libsnmp-dev
 
 - php_packages:
   - php8.3
@@ -86,8 +87,8 @@
 # このほかのパラメータはvars/${ENVIROMENT}.yml側に定義
 - character_set_server: utf8mb4
 - collation_server: utf8mb4_unicode_ci
-
-- cacti_unarchive_path: /var/www/cacti-1.2.24
+- cacti_download_url: '/usr/local/packages/cacti-1.2.27.tar.gz'
+- cacti_unarchive_path: /var/www/cacti-1.2.27
 - cacti_root_path: /var/www/cacti
 - spine_version: '1.2.27'
 
