@@ -38,6 +38,7 @@ galaxy_info:
       - stretch
   - name: Ubuntu
     versions:
+      - jammy
       - focal
       - bionic
       - xenial

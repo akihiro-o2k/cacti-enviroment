@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 # test Ubuntu version
-describe "[1]:OS のバージョンは Ubuntu 20.04 であることを確認する::" do
+describe "[1]:OS のバージョンは Ubuntu 22.04 であることを確認する::" do
   describe command("lsb_release -a") do
-    its(:stdout) { should match /Ubuntu 20.04/ }
+    its(:stdout) { should match /Ubuntu 22.04/ }
   end
 end
 describe "[2]:/etc/profile.d/proxy_setting.shの存在確認::" do

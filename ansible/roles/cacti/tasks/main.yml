@@ -1,10 +1,5 @@
 ---
 
-- name: install cacti native dependency package
-  apt:
-    name:
-      "{{ native_packages }}"
-
 - name: directory check
   stat:
     path: "{{ cacti_root_path  }}"
@@ -16,6 +11,8 @@
   when:
     - d.stat.exists == true
     - d.stat.isdir == true
+
+
 
 - name: download & unzip cacti.tar.gz
   ansible.builtin.unarchive:

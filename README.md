@@ -1,5 +1,8 @@
 # システム設計書
 
+### TODO:
+- spine のインストレーションで必要となるパッケージhelp2manはインストール時に対話形式入力でOKボタンを押下する必要があるのでansibleのモジュールを調べて自動で処理する振る舞いを追加する。
+- 同じく、libmariadb-devも対話形式なので最初に実行する必要が出た。
 ## 概要
 
 - 「統合網トラフィック可視化基盤」(以後、案件の名称を「可視化案件」と省略表記する)における、トラフィック可視化を実現する為のシステム設計を当該文書にて定義する。
@@ -109,8 +112,8 @@
   - Cactiの動作に必要となるミドルウェアを「[設計へのインプットとなる要件、及び、関連文書・仕様](#設計へのインプットとなる文書・及び仕様)」で定義の文書に照らし合わせ、標準利用可能なミドルウェア・バージョンを選定する。
 - 必須ミドルウェア(初期構築時のバージョン[^0])
     1. Apache(2.4.x)
-    1. ~~php(8.1)~~　php(8.2)
-    1. ~~mariadb(10.8)~~ mariadb(10.11)
+    1. ~~php(8.1) php(8.2)~~ php(8.3)
+    1. ~~mariadb(10.8) mariadb(10.11)~~ mariadb(11.4)
 
 - アプリケーション導入に付随して導入するネイティブパッケージ[^1]
   - ppa:ondrej/php
@@ -149,7 +152,7 @@
 
 #### 動作環境
 
-- サーバーOS: Ubuntu 20.04.4 LTS
+- サーバーOS: Ubuntu 22.04.4 LTS
 - サーバープロビジョニング方式
   - ansible [core 2.12.6]
     - python version = 3.8.10 (default, Mar 15 2022, 12:22:08) [GCC 9.4.0]
@@ -195,14 +198,18 @@
 
       ```yaml
       network:
+        version: 2
+        renderer: networkd
         ethernets:
           ens33:
-            addresses: [10.223.164.110/27]
-            gateway4: 10.223.164.97
+            dhcp4: false
+            dhcp6: false
+            addresses: [10.223.164.112/27]
+            routes:
+              - to: default
+                via: 10.223.164.97
             nameservers:
-              addresses: [10.39.175.12,10.39.119.76]
-              search: []
-        version: 2
+              addresses: [10.39.175.12,10.39.119.76] 
       ```
   1. /etc/ssh/sshd_configの編集
       ```bash
@@ -265,10 +272,10 @@
      10.22.164.100 orion01
      10.22.164.101 orion02
      10.22.164.102 orion_db01
-     10.22.164.103 orion_db02
      10.22.164.104 orion_vip
      10.22.164.108 cacti01
      10.22.164.109 cacti02
+     10.22.164.112 cacti03
      ```
 
   1. SSH公開鍵作成(ED25519鍵)
@@ -326,6 +333,18 @@
       sudo gem install highline ed25519 bcrypt_pbkdf
       ```
 
+  1. その他、ansibleでパッケージをあらかじめDLして使用するケースでの格納先ディレクトリを作成。
+     ```bash
+     sudo mkdir /usr/local/packages
+     sudo chmod 777 /usr/local/packages
+     ```
+     # 配備予定のパッケージ
+     ```bash
+     cd /usr/local/packages
+     wget https://files.cacti.net/cacti/linux/cacti-1.2.27.tar.gz 
+     wget http://www.cacti.net/downloads/spine/cacti-spine-1.2.27.tar.gz
+     falcon-sensor
+     ```
 #### cacti01/02(共通)
 
   1. Ubuntu20.04のインストール[^2]
@@ -531,3 +550,5 @@
 [^2]: インストール時の対話形式入力値。別紙「[Ubuntu20インストール手順](doc/how_to_install_ubuntu20.md)」を参照。
 [^3]: サーバープロビジョニング／テストを実行する為のテンポラリユーザー。「[Ubuntu20インストール手順](doc/how_to_install_ubuntu20.md)」内で追加し、セキュリティ観点で最終的に削除を実施。
 [^4]: serverspec(rspec)の用語で単一の`テスト`を指す文言。10件のテストを実施する場合は10examples(複数形)となる。
+
+
