@@ -1,5 +1,8 @@
 # システム設計書
 
+### TODO:
+- spine のインストレーションで必要となるパッケージhelp2manはインストール時に対話形式入力でOKボタンを押下する必要があるのでansibleのモジュールを調べて自動で処理する振る舞いを追加する。
+
 ## 概要
 
 - 「統合網トラフィック可視化基盤」(以後、案件の名称を「可視化案件」と省略表記する)における、トラフィック可視化を実現する為のシステム設計を当該文書にて定義する。
@@ -269,10 +272,10 @@
      10.22.164.100 orion01
      10.22.164.101 orion02
      10.22.164.102 orion_db01
-     10.22.164.103 orion_db02
      10.22.164.104 orion_vip
      10.22.164.108 cacti01
      10.22.164.109 cacti02
+     10.22.164.112 cacti03
      ```
 
   1. SSH公開鍵作成(ED25519鍵)
@@ -330,6 +333,18 @@
       sudo gem install highline ed25519 bcrypt_pbkdf
       ```
 
+  1. その他、ansibleでパッケージをあらかじめDLして使用するケースでの格納先ディレクトリを作成。
+     ```bash
+     sudo mkdir /usr/local/packages
+     sudo chmod 777 /usr/local/packages
+     ```
+     # 配備予定のパッケージ
+     ```bash
+     cd /usr/local/packages
+     wget https://files.cacti.net/cacti/linux/cacti-1.2.27.tar.gz 
+     wget http://www.cacti.net/downloads/spine/cacti-spine-1.2.27.tar.gz
+     falcon-sensor
+     ```
 #### cacti01/02(共通)
 
   1. Ubuntu20.04のインストール[^2]
@@ -535,3 +550,5 @@
 [^2]: インストール時の対話形式入力値。別紙「[Ubuntu20インストール手順](doc/how_to_install_ubuntu20.md)」を参照。
 [^3]: サーバープロビジョニング／テストを実行する為のテンポラリユーザー。「[Ubuntu20インストール手順](doc/how_to_install_ubuntu20.md)」内で追加し、セキュリティ観点で最終的に削除を実施。
 [^4]: serverspec(rspec)の用語で単一の`テスト`を指す文言。10件のテストを実施する場合は10examples(複数形)となる。
+
+

@@ -25,5 +25,4 @@
 - tmp_table_size: 70000000
 - join_buffer_size: 9MB
 - sort_buffer_size: 1M 
-- cacti_download_url: '/usr/local/packages/cacti-1.2.24.tar.gz'
 

@@ -1,7 +1,6 @@
 mariadb_packages:
   - mariadb-server
   - mariadb-common
-  #- python-openssl
   - python3-openssl
   - python3-mysqldb
 repo_software_package:

@@ -5,6 +5,19 @@
   apt:
     name: "{{ spine_packages }}"
 
+#- name: start service snmpd
+#  ansible.builtin.service:
+#    name: snmpd
+#    state: started
+
+# 起動時有効化設定
+#- name: snmpd service state
+#  become: yes
+#  service:
+#    name: snmpd
+#    state: started
+#    enabled: yes
+
 - name: result1-check cacti-spine.tar.gz exists?
   stat:
     path: "/usr/local/packages/cacti-spine-{{ spine_version }}.tar.gz"
@@ -16,24 +29,24 @@
     msg: "{{ result1.stat.exists }}"
 
 # 商用はSCPで/tmpにアップロード
-- name: development get cacti-spine source file
-  ansible.builtin.get_url:
-    url: "http://www.cacti.net/downloads/spine/cacti-spine-{{ spine_version }}.tar.gz"
-    validate_certs: no
-    dest: /tmp
-    mode: '0770'
-  when: result1.stat.exists==false
-    and stage == 'development'
+#- name: development get cacti-spine source file
+#  ansible.builtin.get_url:
+#    url: "http://www.cacti.net/downloads/spine/cacti-spine-{{ spine_version }}.tar.gz"
+#    validate_certs: no
+#    dest: /tmp
+#    mode: '0770'
+#  when: result1.stat.exists==false
+#    and stage == 'development'
 
-- name: upload spain package for production 
+- name: upload spain package 
   ansible.builtin.unarchive:
     src: "/usr/local/packages/cacti-spine-{{ spine_version }}.tar.gz"
     dest: /tmp/
     owner: www-data
     group: www-data
     mode: 0775
-  when: stage == 'production'
-  
+    #  when: stage == 'production'
+
 - name: result2-check cacti-spine.tar.gz exists?
   stat:
     path: "/tmp/cacti-spine-{{ spine_version }}.tar.gz"
@@ -53,6 +66,7 @@
     path: "/tmp/cacti-spine-{{ spine_version }}"
   register: result3
   ignore_errors: yes
+
 
 - name: spein bin exist?
   stat:
