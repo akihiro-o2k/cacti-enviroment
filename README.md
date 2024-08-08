@@ -2,7 +2,7 @@
 
 ### TODO:
 - spine のインストレーションで必要となるパッケージhelp2manはインストール時に対話形式入力でOKボタンを押下する必要があるのでansibleのモジュールを調べて自動で処理する振る舞いを追加する。
-- 同じく、libmariadb-devも対話形式なので最初に実行する必要が出た。
+- 同じく、libmariadb-dev,rrdtoolも対話形式なので最初に実行する必要が出た。
 ## 概要
 
 - 「統合網トラフィック可視化基盤」(以後、案件の名称を「可視化案件」と省略表記する)における、トラフィック可視化を実現する為のシステム設計を当該文書にて定義する。
@@ -98,47 +98,51 @@
 - cactiインストールのソース及び、バージョン定義
   - 「【統合網トラフィック可視化基盤】構築方針書_v1.1_20221213.pptx」4頁、「業務実施内容(2/2)」より引用。
     > CactiソースコードのバージョンはNTTコムと協議の上、決定する
-    - 当該文書記載時点(2022/09/13)での最新の安定版がcacti-1.2.22となっている。
+    - ~~当該文書記載時点(2022/09/13)での最新の安定版がcacti-1.2.22となっている。~~
+      2024年8月更新:維持管理フェーズの作業「Ubuntu22へのOSアップグレード作業」にてCactiのソースコードは最新安定版の1.2.27を適用した。
     - アプリケーションはUbuntu公式が提供するaptリポジトリのバージョンが公式サイトの最新安定版と乖離がった為、公式サイトが提供する最新版を直接取得してインストールする方式を採用する。
 
       ```bash
       # cacti公式サイト（）の対象バージョンダウンロードURL
-      wget https://files.cacti.net/cacti/linux/cacti-1.2.22.tar.gz
+      wget https://files.cacti.net/cacti/linux/cacti-1.2.27777777.tar.gz
       ```
 
 ### ミドルウェア
 
 - 選定基準
   - Cactiの動作に必要となるミドルウェアを「[設計へのインプットとなる要件、及び、関連文書・仕様](#設計へのインプットとなる文書・及び仕様)」で定義の文書に照らし合わせ、標準利用可能なミドルウェア・バージョンを選定する。
-- 必須ミドルウェア(初期構築時のバージョン[^0])
+- 必須ミドルウェア(初期構築時のバージョン[^0]) 
     1. Apache(2.4.x)
     1. ~~php(8.1) php(8.2)~~ php(8.3)
     1. ~~mariadb(10.8) mariadb(10.11)~~ mariadb(11.4)
+- 備考: 2024年8月更新:維持管理フェーズの作業「Ubuntu22へのOSアップグレード作業」にてミドルウェアは標準催促別紙「標準化技術リスト」の要件に適合するバージョンにアップグレードを実施（取り消し線は過去のバージョン）
 
 - アプリケーション導入に付随して導入するネイティブパッケージ[^1]
-  - ppa:ondrej/php
-  - apt-transport-https
-  - software-properties-common
-  - dirmngr
-  - snmp
-  - snmpd
+  - libmariadb-dev
+  - help2man
   - rrdtool
+  - snmp
   - libmysql++-dev
   - libsnmp-dev
-  - help2man
-  - dos2unix
   - autoconf
-  - dh-autoreconf
   - libssl-dev
-  - librrds-perl
-  - snmp-mibs-downloader
+  - software-properties-common
+  - git
+  - python3-openssl
+  - libmariadb-dev
   - build-essential
-  - traceroute
-  - jq
-  - libproxy-tools
+  - automake
+  - gzip
+  - m4
+  - make
+  - wget
+  - libtool
+  - libnet-snmp-perl
+  - libsnmp-dev
+
 
 - 特記事項
-  - php8.1で構築を進めているが、php7から8へメジャーバージョンアップに際して廃止となった関連パッケージ及びメソッドがある為、cactiの動作結果に問題が生じる際は協議の上でcacti公式サイトの想定するバージョン(php7.4以下)へのダウングレードを行うものとする。
+  - ~~php8.1で構築を進めているが、php7から8へメジャーバージョンアップに際して廃止となった関連パッケージ及びメソッドがある為、cactiの動作結果に問題が生じる際は協議の上でcacti公式サイトの想定するバージョン(php7.4以下)へのダウングレードを行うものとする。~~ 2024年8月更新:維持管理フェーズの作業「Ubuntu22へのOSアップグレード作業」にてPHP8.3にアップグレード
 
   - 上記、cactiのバージョンは構築の方式検討開始時点でcactiの公式サイトで最新の安定版パッケージを選定したが、導入検証作業内において動作の不具合等が確認された場合はお客様と協議の上、バージョンダウン等を行い安定稼働するバージョンで納品を行う。
 
@@ -197,6 +201,7 @@
       - 以下、01-netcfg.yamlの記入例
 
       ```yaml
+      # Ubuntu22版でnetcfgのシンタックスに変更あり。
       network:
         version: 2
         renderer: networkd

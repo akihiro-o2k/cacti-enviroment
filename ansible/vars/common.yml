@@ -8,10 +8,12 @@
 - root_passwd: "Visualize0033!"
 
 - native_packages:
+  - libmariadb-dev
+  - help2man
+  - rrdtool
   - snmp
   - libmysql++-dev
   - libsnmp-dev
-  - help2man
   - autoconf
   - libssl-dev
   - software-properties-common
