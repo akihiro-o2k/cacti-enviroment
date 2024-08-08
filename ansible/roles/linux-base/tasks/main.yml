@@ -1,5 +1,16 @@
 ---
 
+# Ubunru22での更新、パッケージ導入後のデーモン自動リスタート設定
+# roles/linux-base/templates/etc/needrestart/conf.d/50local.conf
+- name: create /etc/needrestart/conf.d/50local.conf
+  become: yes
+  template:
+    src: etc/needrestart/conf.d/50local.conf
+    dest: /etc/needrestart/conf.d/50local.conf
+    owner: root
+    group: root
+    mode: 0644
+
 # proxy設定
 - name: create /etc/profile.d/proxy_setting.sh
   become: yes

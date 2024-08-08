@@ -1,8 +1,17 @@
 # システム設計書
 
-### TODO:
+## Ubuntu22での注意点:
+- Ubuntu 21.04から、サーバー版に「needrestart」というパッケージが最初からインストールされるようになりました
+  - https://gihyo.jp/admin/serial/01/ubuntu-recipe/0718
+### 付随する問題点
 - spine のインストレーションで必要となるパッケージhelp2manはインストール時に対話形式入力でOKボタンを押下する必要があるのでansibleのモジュールを調べて自動で処理する振る舞いを追加する。
 - 同じく、libmariadb-dev,rrdtoolも対話形式なので最初に実行する必要が出た。
+- needrestartの設定ファイルを配備して自動リスタートする設定を投入したがうまく課題解決できないため、影響範囲にあるパッケージインストールをAnsibleでのプロビジョニング実行前に行う。
+    ```bash
+    # 暫定対処(ansible実行前に手動インストール)
+    sudo apt install -y help2man libmariadb-dev rrdtool
+    ```
+
 ## 概要
 
 - 「統合網トラフィック可視化基盤」(以後、案件の名称を「可視化案件」と省略表記する)における、トラフィック可視化を実現する為のシステム設計を当該文書にて定義する。
@@ -49,11 +58,14 @@
                   ├── orion01     10.223.164.100 (orion server01号機)
                   ├── orion02     10.223.164.101 (orion server02号機)
                   ├── orion_db01  10.223.164.102 (orion database01号機)
-                  ├── orion_db02  10.223.164.103 (orion database02号機)
-                  ├── orion_vip   10.223.164.104 (orion HA対応用のVIP)
+                  ├── ~~orion_vip   10.223.164.104 (orion HA対応用のVIP)~~
                   ├── cacti01     10.223.164.108 (cacti01号機)
                   ├── cacti02     10.223.164.109 (cacti02号機)
                   ├── provision   10.223.164.110 (管理用VM)
+                  ├── cacti03     10.223.164.112 (Cacti系VM入れ替え作業で使用するcacti03号機)
+                  ├── orion03     10.223.164.113 (orion03号機)
+                  ├── orion04     10.223.164.114 (orion04号機)
+                  ├── orion_vip   10.223.164.115 (orion HA対応用のVIP)
                   └── _gateway    10.223.164.97   (DefaultGateway(fw01))
     ```
 
@@ -104,7 +116,7 @@
 
       ```bash
       # cacti公式サイト（）の対象バージョンダウンロードURL
-      wget https://files.cacti.net/cacti/linux/cacti-1.2.27777777.tar.gz
+      wget https://files.cacti.net/cacti/linux/cacti-1.2.27.tar.gz
       ```
 
 ### ミドルウェア
