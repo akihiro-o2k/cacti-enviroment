@@ -19,9 +19,9 @@
   #- 10.39.72.3
 
 #- dns:
-#  - "10.39.175.12 10.39.119.76"
+#  - "10.39.72.2 10.39.64.2"
 
-- proxy_server: 10.39.73.56
+- proxy_server: erproxy.noc.ntt.com
 - proxy_port: 50080
 - use_proxy: yes
 - proxy_env: 
