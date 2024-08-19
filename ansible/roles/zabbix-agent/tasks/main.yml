@@ -6,7 +6,7 @@
 - name: install zabbix-agent
   become: yes
   apt:
-    name: zabbix-agent=1:4.0.17+dfsg-1
+    name: zabbix-agent=1:5.0.17+dfsg-1
   when: result.stat.exists == false and stage == 'production'
 
 - name: create /etc/zabbix/zabbix-agentd.conf
