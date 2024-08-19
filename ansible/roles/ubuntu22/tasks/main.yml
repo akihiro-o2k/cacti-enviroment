@@ -1,0 +1,49 @@
+---
+
+# Ubunru22での更新、パッケージ導入後のデーモン自動リスタート設定
+# roles/linux-base/templates/etc/needrestart/conf.d/50local.conf
+- name: create /etc/needrestart/conf.d/50local.conf
+  become: yes
+  template:
+    src: etc/needrestart/conf.d/50local.conf
+    dest: /etc/needrestart/conf.d/50local.conf
+    owner: root
+    group: root
+    mode: 0644
+
+# proxy設定
+- name: create /etc/profile.d/proxy_setting.sh
+  become: yes
+  template:
+    src: etc/profile.d/proxy_setting.sh.j2
+    dest: /etc/profile.d/proxy_setting.sh
+    owner: root
+    group: root
+    mode: 0755
+  # 適用すべき環境はstageを参照して切り替え
+  when: stage == 'production'
+
+# aptのリポジトリ参照先をarchive.ubuntu.comからjp.archive.ubuntu.comに変更
+- name: create /etc/apt/sources.list/
+  become: yes
+  template:
+    src: etc/apt/sources.list
+    dest: /etc/apt/sources.list
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+  when: stage == "production"
+
+# apt proxy setting
+- name: create /etc/apt/apt.conf.d/30proxy
+  become: yes
+  template:
+    src: etc/apt/apt.conf.d/30proxy.j2
+    dest: /etc/apt/apt.conf.d/30proxy
+    backup: true
+    owner: root
+    group: root
+    mode: 0644
+  when: stage == "production"
+

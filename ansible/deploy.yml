@@ -5,15 +5,25 @@
     - vars/{{ stage }}.yml
     - vars/common.yml
   roles:
-    - linux-base
+    - ubuntu22
   tags:
-    - linux-base
+    - ubuntu22
+
+- hosts: material 
+  vars_files:
+    - vars/{{ stage }}.yml
+    - vars/common.yml
+  roles:
+    - before-install
+  tags:
+    - before-install
 
 - hosts: cacti
   vars_files:
     - vars/{{ stage }}.yml
     - vars/common.yml
   roles:
+    - linux-base
     - httpd
     - db
     - cacti
