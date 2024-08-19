@@ -6,7 +6,7 @@ if ENV['ENVIROMENT'] == 'production'
     end
   end
   describe "[2]falcon-sensorの動作確認::" do
-    describe process("falcon-sensor") do
+    describe service("falcon-sensor") do
       it { should be_running }
       it { should be_enabled }
     end
