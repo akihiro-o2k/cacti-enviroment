@@ -1,0 +1,11 @@
+- name: Update and upgrade apt packages
+  apt:
+    upgrade: "yes"
+    update_cache: yes
+
+- name: pre-execution installation common packages
+  apt:
+    name:
+      - help2man
+      - libmariadb-dev
+      - rrdtool
