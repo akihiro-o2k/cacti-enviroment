@@ -205,7 +205,7 @@
 
       ```bash
       # 既存の設定ファイル名の末尾にdisabledを付けて無効化しつつバックアップ
-      sudo mv /etc/netplan/00-installer-config.yaml /etc/netplan/00-installer-config.yaml.disabled
+      sudo mv /etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml.disabled
       # お客様ご指定のIPアドレス／サブネット等の情報をstaticな値で新規ファイルに記載し適用する。
       sudo vi /etc/netplan/01-netcfg.yaml
       ```
@@ -213,20 +213,24 @@
       - 以下、01-netcfg.yamlの記入例
 
       ```yaml
-      # Ubuntu22版でnetcfgのシンタックスに変更あり。
+      # Ubuntu22版でnetcfgのシンタックスに変更あり。IF名及び(ens3)、MACアドレスを50-cloud-init.yamlを参照して適切な値に書き換え要
       network:
         version: 2
         renderer: networkd
         ethernets:
-          ens33:
+          ens3:
             dhcp4: false
-            dhcp6: false
+            match:
+              macaddress: XX:XX:XX:XX:XX:XX
+            set-name: ens3
             addresses: [10.223.164.112/27]
             routes:
               - to: default
                 via: 10.223.164.97
             nameservers:
-              addresses: [10.39.175.12,10.39.119.76] 
+              addresses: 
+                - 10.39.72.2
+                - 10.39.64.2
       ```
   1. /etc/ssh/sshd_configの編集
       ```bash
