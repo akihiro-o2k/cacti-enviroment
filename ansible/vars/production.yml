@@ -30,7 +30,7 @@
 - innodb_buffer_pool_size: 2G
 - max_heap_table_size: 300000000
 - tmp_table_size: 300000000
-- join_buffer_size: 24MB
+- join_buffer_size: 22MB
 - sort_buffer_size: 2M
 - falcon_sensor_src: /usr/local/packages/falcon-sensor_6.41.0-13804_amd64.deb
 - falcon_sensor_dest: /tmp/falcon-sensor_6.41.0-13804_amd64.deb
