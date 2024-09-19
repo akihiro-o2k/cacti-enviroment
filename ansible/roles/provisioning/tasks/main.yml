@@ -1,0 +1,41 @@
+- name: Update and upgrade apt packages
+  apt:
+    upgrade: "yes"
+    update_cache: yes
+
+# rubyのインストール
+- name: instration ruby stable version
+  apt:
+    name:
+      - software-properties-common
+      - ruby
+      - ruby-dev
+
+# 手動でppa:ansible/ansibleのGPGKEYを追加
+# ref: https://launchpad.net/~ansible/+archive/ubuntu/ansible
+- name: uplaod ppa:ansible Key file
+  template:
+    src:  tmp/ppa_ansible.key
+    dest: /tmp/ppa_ansible.key
+    owner: root
+    group: root
+    mode: 0644
+
+- name: add ppa:ansible apt-key
+  ansible.builtin.apt_key:
+    file: /tmp/ppa_ansible.key
+    state: present
+
+# 商用環境でapt_repositoryが通らない問題への対処
+# 手動で/etc/apt/sources.listにリポジトリを追加
+- name: Add ppa:ansible/ansible Repository
+  apt_repository:
+    repo: "deb https://ppa.launchpadcontent.net/ansible/ansible/ubuntu {{os_alias}} main"
+    state: present
+    filename: ppa_ansible
+
+# Aptリポジトリを追加したのでパッケージ取得のためにaptリポジトリの更新
+- name: Apt update
+  become: yes
+  apt:
+    update_cache: yes

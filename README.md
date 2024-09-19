@@ -359,7 +359,7 @@
      sudo mkdir /usr/local/packages
      sudo chmod 777 /usr/local/packages
      ```
-     # 配備予定のパッケージ
+     - 上記ディレクトリに配備予定のパッケージ
      ```bash
      cd /usr/local/packages
      wget https://files.cacti.net/cacti/linux/cacti-1.2.27.tar.gz 
@@ -468,8 +468,13 @@
           # serverspecの実行コマンドsyntax
           # ansible-playbook -i [イベントリファイル名] -l [実行ロール名] [プロビジョニングファイル名] [オプション]
           # 尚、イベントリファイル名は実行環境をserverspecと共通化する為にサーバーENV化を推奨。
-          # ロールは現在all,cacit[01|02]を想定。
+          # ロールは現在all,cacit[01|02|03]を想定。
           # ->Option： -C(Dry Runの実行),-v(詳細表示。vの数でより詳細情報を表示)
+          #
+          # Ubuntu22.04でのneedrestart追加に伴う事前処理
+          # ->影響が生じるパッケージのインストールとneedrestart設定を事前にAnsibleで変更。
+          ansible-playbook -i ${ENVIROMENT}.ini -l materia01 deploy.yml -vv
+          # 実際のcacti01/02/03構築を行うansible-playbook実行コマンド
           ansible-playbook -i ${ENVIROMENT}.ini -l cacti01 deploy.yml -vvv
           ```
 
