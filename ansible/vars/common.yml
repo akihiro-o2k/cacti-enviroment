@@ -89,3 +89,7 @@
 
 - images_directory: /var/www/images
 - backlog_directory: /var/www/images/backlog
+
+# 下記のgoogle-chromeのサイトで、chrome及びchromedriverが提供されているstable版のバージョンをチェックの上で定義する。
+# https://googlechromelabs.github.io/chrome-for-testing/
+- chrome_version: '129.0.6668.58'
