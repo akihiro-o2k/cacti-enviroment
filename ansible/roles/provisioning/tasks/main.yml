@@ -26,7 +26,6 @@
     file: /tmp/ppa_ansible.key
     state: present
 
-# 商用環境でapt_repositoryが通らない問題への対処
 # 手動で/etc/apt/sources.listにリポジトリを追加
 - name: Add ppa:ansible/ansible Repository
   apt_repository:
@@ -34,8 +33,41 @@
     state: present
     filename: ppa_ansible
 
+# 手動でgoogle-chromeのGPGKEYを追加
+# ref: https://qiita.com/ekzemplaro/items/11539f5bd9b80a6c7dca
+# ref: https://www.slimjet.com/chrome/google-chrome-old-version.php 
+- name: uplaod google-chrome Key file
+  template:
+    src:  tmp/google-chrome.key
+    dest: /tmp/google-chrome.key
+    owner: root
+    group: root
+    mode: 0644
+
+- name: add google-chrome apt-key
+  ansible.builtin.apt_key:
+    file: /tmp/google-chrome.key
+    state: present
+
+# 手動で/etc/apt/sources.listにリポジトリを追加
+- name: Add google-chrome Repository
+  apt_repository:
+    repo: "deb http://dl.google.com/linux/chrome/deb/ stable main"
+    state: present
+    filename: google-chrome
+
+
+- name: Install google-chrome with specified version 
+  apt:
+    name: "google-chrome={{chrome_version}}"
+
 # Aptリポジトリを追加したのでパッケージ取得のためにaptリポジトリの更新
 - name: Apt update
   become: yes
   apt:
     update_cache: yes
+
+
+# Chrome-driverのインストール
+# ref: https://voicetechno-jp.secure-web.jp/ChromeDriverV115orNewer.html  
+# download: https://developer.chrome.com/docs/chromedriver/downloads?hl=ja
