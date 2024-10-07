@@ -1,16 +1,14 @@
 @startuml
 !define AzurePuml https://raw.githubusercontent.com/plantuml-stdlib/Azure-PlantUML/release/2-2/dist
 !includeurl AzurePuml/AzureCommon.puml
-!includeurl AzurePuml/Databases/all.puml
-!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Identity/all.puml
 !include <office/Servers/application_server>
 !include <office/Servers/database_server>
-
 nwdiag {
   network InternetCloud {
     internet [shape = cloud];
     internet -- router;
-    AzureAD [description="test"];
+    AzureAD [description = "     <$AzureActiveDirectory>\n Microsoft EntraID "];
     
   }
   network common-network {  
@@ -41,6 +39,4 @@ nwdiag {
     orion04;
   }
 }
-
-
 @enduml
