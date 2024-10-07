@@ -1,0 +1,46 @@
+@startuml
+!define AzurePuml https://raw.githubusercontent.com/plantuml-stdlib/Azure-PlantUML/release/2-2/dist
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/Databases/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!include <office/Servers/application_server>
+!include <office/Servers/database_server>
+
+nwdiag {
+  network InternetCloud {
+    internet [shape = cloud];
+    internet -- router;
+    AzureAD [description="test"];
+    
+  }
+  network common-network {  
+    router;
+    comFW;
+    user [description = "   <&person*4.5>\n npm user"];
+  }
+  network fic-gateway {
+    comFW;
+    address = "10.223.156.145/28"
+    vFW01 [address ="10.223.156.149"]
+    vFW02 [address ="10.223.156.150"]
+  }
+  network server-segment {
+      address = "10.223.164.96/27";
+      vFW01 [address ="10.223.164.98"]
+      vFW02 [address ="10.223.164.99"]
+      vip [address = "10.223.164.115",  description = "tm-npm-v.sys.ntt.com"];
+      orion03 [address = "10.223.164.113" description = "tm-npm03.sys.ntt.com"];
+      orion04 [address = "10.223.164.114" description = "tm-npm04.sys.ntt.com"];
+      orion_db01 [address = "10.223.164.102",  description = "<$database_server>\n  db"];
+      
+  }
+  group nightly {
+    color = "#FFAAAA";
+    description = "設定変更対象(NPM ACT/SBY)";
+    orion03;
+    orion04;
+  }
+}
+
+
+@enduml
