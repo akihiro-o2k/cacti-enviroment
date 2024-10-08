@@ -1,10 +1,10 @@
 @startuml
-// ref: https://github.com/plantuml-stdlib/Azure-PlantUML
 !define AzurePuml https://raw.githubusercontent.com/plantuml-stdlib/Azure-PlantUML/release/2-2/dist
 !includeurl AzurePuml/AzureCommon.puml
 !includeurl AzurePuml/Identity/all.puml
 !include <office/Servers/application_server>
 !include <office/Servers/database_server>
+
 nwdiag {
   network InternetCloud {
     internet [shape = cloud];
@@ -15,7 +15,8 @@ nwdiag {
   network common-network {  
     router;
     comFW;
-    user [description = "   <&person*4.5>\n npm user"];
+    lu [description = "   <&person*4.5>\n npm user"]
+    user [description = "   <$AzureActiveDirectoryUser>\n AzureAD user\n(プリンシパル)"];
   }
   network fic-gateway {
     comFW;
@@ -27,17 +28,16 @@ nwdiag {
       address = "10.223.164.96/27";
       vFW01 [address ="10.223.164.98"]
       vFW02 [address ="10.223.164.99"]
-      vip [address = "10.223.164.115",  description = "tm-npm-v.sys.ntt.com"];
-      orion03 [address = "10.223.164.113" description = "tm-npm03.sys.ntt.com"];
-      orion04 [address = "10.223.164.114" description = "tm-npm04.sys.ntt.com"];
-      orion_db01 [address = "10.223.164.102",  description = "<$database_server>\n  db"];
-      
+      vip [address = "10.223.164.115"  description = "[VIP]\ntm-npm-v.sys.ntt.com"];
+      orion03 [address = "10.223.164.113" description = "[ACT]\ntm-npm03.sys.ntt.com"];
+      orion04 [address = "10.223.164.114" description = "[SBY]\ntm-npm04.sys.ntt.com"];
+      orion_db01 [address = "10.223.164.102"  description = "<$database_server>\n  db"]; 
   }
-  group nightly {
-    color = "#FFAAAA";
-    description = "設定変更対象(NPM ACT/SBY)";
-    orion03;
-    orion04;
+  group Authnication {
+    color = "#33ccff";
+    description = "ID プロバイダー (IdP)";
+    AzureAD;
+    user;
+    vip;
   }
-}
 @enduml
