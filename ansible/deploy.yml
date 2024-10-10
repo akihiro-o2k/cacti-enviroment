@@ -44,10 +44,11 @@
 
 - hosts: provisioning
   vars_files:
-    - vars/provisioning.yml
     - vars/common.yml
   roles:
     - before-install
+    - provisioning
   tags:
     - before-install
+    - provisioning
 
