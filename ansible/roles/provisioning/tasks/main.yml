@@ -3,15 +3,30 @@
     upgrade: "yes"
     update_cache: yes
 
-# rubyとunzipをインストール
-- name: instration ruby stable version
+# gitとunzipをインストール
+- name: instoration git and uzip 
   become: yes
   apt:
     name:
       - software-properties-common
-      - ruby
-      - ruby-dev
+      - git
       - unzip
+      - vim
+      - autoconf
+      - patch
+      - build-essential 
+      - rustc 
+      - libssl-dev 
+      - libyaml-dev 
+      - libreadline6-dev 
+      - zlib1g-dev 
+      - libgmp-dev 
+      - libncurses5-dev 
+      - libffi-dev 
+      - libgdbm6 
+      - libgdbm-dev 
+      - libdb-dev
+      - uuid-dev
 
 # 手動でppa:ansible/ansibleのGPGKEYを追加
 # ref: https://launchpad.net/~ansible/+archive/ubuntu/ansible
@@ -91,29 +106,127 @@
     group: develop
     mode: 0775
 
-- name: unarchive_dir_check
+# chromodriverインストールディレクトリの存在確認
+- name: unarchive_dir check for /tmp
   stat:
     path: "/tmp/chromedriver-linux64"
-  register: tmpcd
+  register: chromedriver_dir
 
-
-#- name: unzip chromedriver-linux64.zip
-#  become: yes
-#  command:
-#    cmd: "unzip /tmp/chromedriver-linux64.zip"
-#  when:
-#    - tmpcd.stat.exists == false
-
+# chromedriver_dirが存在しないケースではunzipして作成
 - name: unzip chromedriver-linux64.zip
   ansible.builtin.unarchive:
     src: "/tmp/chromedriver-linux64.zip"
     dest: /tmp/
     remote_src: yes
   when:
-    - tmpcd.stat.exists == false
+    - chromedriver_dir.stat.exists == false
+
+# 再度chromodriverインストールディレクトリの存在確認
+- name: unarchive_dir check for /usr/local/bin
+  stat:
+    path: "/usr/local/bin/chromedriver"
+  register: chromedriver
+
+# Chrome-driverの配置
+- name: install chromodriver
+  become: yes
+  command:
+    cmd: "mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/"
+  when:
+    - chromedriver.stat.exists == false
+
+- name: set permission /usr/local/bin/chromedriver
+  become: yes
+  command:
+     cmd: "chmod 777 /usr/local/bin/chromedriver"
+
+# chromedriverにパスが通っているか確認
+- name: check to chromedriver path
+  shell: "whereis chromedriver"
+  register: chromedriver_path
+
+# pathを画面出力(動作確認用)
+- name: debug chromedriver_path
+  debug:
+    msg: "{{ chromedriver_path.stdout }}"
+
+# versionの表示でchromodriverの実行ファイル動作確認
+- name: execute chromedriver --version command
+  shell: "chromedriver --version"
+  register: chromedriver_version
+
+- name: is_exist /usr/local/ebenv
+  stat:
+    path: "/usr/lib/rbenv"
+  register: rbenv
+
+- name: git clone rbenv
+  become: yes
+  command:
+    cmd: "git clone https://github.com/rbenv/rbenv.git /usr/lib/rbenv"
+  when:
+    - rbenv.stat.exists == false
+
+- name: chown rbenv
+  become: yes
+  command:
+    cmd: "chown -R develop:develop /usr/lib/rbenv"
+
+#- name: is_exist /usr/local/ruby-build
+#  stat:
+#    path: "/usr/local/ruby-build"
+#  register: ruby_build
+
+- name: git clone ruby-build
+  become: yes
+  command:
+    cmd: "git clone https://github.com/sstephenson/ruby-build.git /usr/lib/rbenv/plugins/ruby-build"
+    #  when:
+    #- ruby_build.stat.exists == false
+
+- name: is_exist check for /etc/profile.d/rbenv.sh
+  stat:
+    path: "/etc/profile.d/rbenv.sh"
+  register: rbenv_sh
+
+# add script /etc/profile.d/rbenv.sh
+- name: uplaod /etc/profile.d/rbenv.sh
+  become: yes
+  template:
+    src:  etc/profile.d/rbenv.sh
+    dest: /etc/profile.d/rbenv.sh
+    owner: root
+    group: root
+    mode: 0755
+  when:
+    - rbenv_sh.stat.exists == false
+
+# execute /etc/profile.d/rbenv.sh
+- name: exec /etc/profile.d/rbenv.sh
+  become: yes
+  command:
+     cmd: '/bin/bash -c /etc/profile.d/rbenv.sh && /bin/bash -c /usr/lib/rbenv/bin/rbenv init'
+
+#- name: rbenv init
+#  become: yes
+#  command:
+#    cmd: '/bin/bash -c /usr/local/rbenv/bin/rbenv init'
+
+# install ruby
+- name: install ruby
+  become: yes
+  command:
+     cmd: "/bin/bash -c /etc/profile.d/rbenv.sh && rbenv install {{ ruby_version }}"
 
 
-# google-chrome --version | cut -d' ' -f3`
-# Chrome-driverのインストール
-# ref: https://voicetechno-jp.secure-web.jp/ChromeDriverV115orNewer.html  
-# download: https://developer.chrome.com/docs/chromedriver/downloads?hl=ja
+# install ruby
+- name: install ruby
+  become: yes
+  command:
+     cmd: "/bin/bash -c /etc/profile.d/rbenv.sh && rbenv grobal {{ ruby_version }}"
+# ruby gemをインストール
+#- name: gem install selenium-webdriver
+#  become: yes
+#  command:
+#    cmd: "sudo gem install selenium-webdriver"
+
