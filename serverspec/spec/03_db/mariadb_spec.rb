@@ -7,7 +7,7 @@ describe '[1]mariadb-serverパッケージがインストールされている�
 end
 describe "[2]指定バージョン'#{COMMON['mariadb_version']}'でインストールされている事::" do
   describe command("mysqladmin -uroot -p#{COMMON['mysql_root_password']} -h#{COMMON['bind-address']} --version") do
-    its(:stdout)  { should match /11.4.3-MariaDB/ }
+    its(:stdout)  { should match /11.4.4-MariaDB/ }
   end
 end
 describe '[3]systemd関連:mariadbの起動と再起動時の動作を確認::' do

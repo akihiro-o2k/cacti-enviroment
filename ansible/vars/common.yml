@@ -70,7 +70,8 @@
 - db_user_password: cactiuser
 # 独自改修箇所:ミラーサイトとバージョンを同一URIで変数渡し
 # ミラーサイトからパッケージが消失するケースあり。doc/use_of_ansible-galaxy.mdに該当するエラーメッセージ例と対処方法を記載。
-- mariadb_repo: 'deb https://atl.mirrors.knownhost.com/mariadb/repo/11.4/ubuntu'
+# 2025.01.07 mariadbミラーサイトのSSL証明証が無効になっている為、暫定でhttpでアクセス。
+- mariadb_repo: 'deb http://atl.mirrors.knownhost.com/mariadb/repo/11.4/ubuntu'
 - import_sql_file: true
 - sql_file_name:
   - { db: 'cactidb', file: '01_criate_cacti_tables.sql' }
