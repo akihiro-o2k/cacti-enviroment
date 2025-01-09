@@ -1,0 +1,53 @@
+# SSL-private-keyの配備
+- name: upload spain package for production
+  ansible.builtin.copy:
+    src: "/usr/local/settings/{{ lockup('env', 'distination-hostname')}}.key"
+    dest: /etc/ssl/private/
+    owner: develop
+    group: develop
+    mode: 0775
+  when: stage == 'production'
+# SSL-証明証ファイルの配備
+
+# SSL-中間証明証の配備
+
+# apache module mellonをインストール
+- name: Install libapache2-mod-auth-mellon
+  become: yes
+  apt:
+    name:
+      - libapache2-mod-auth-mellon
+
+# moduleの有効化
+- name: a2enmod auth_mellon
+  become: yes
+  command:
+    cmd: "a2enmod auth_mellon"
+
+# Module追加後にapache2の再起動
+- name: Reload service apache2, in all cases
+  ansible.builtin.systemd:
+    name: apache2.service
+    state: restart
+
+# Mellonルートディレクトリの作成
+- name: create mellon working directory
+  become: yes
+  ansible.builtin.file:
+    path: /etc/apache2/mellon
+    state: directory
+    recurse: yes
+    owner: www-data
+    group: www-data
+
+# upload mellon_create_metadata.sh
+# aptパッケージで同梱されるmeloon_create_metadataコマンドがエラーとなる為、
+# sourceリポジトリから取得したshファイルにコミュニティーのバグフィックス内容を追記したファイルを作成。
+# ref: https://bugs.launchpad.net/ubuntu/+source/ssl-cert/+bug/1945774
+- name: uplaod mellon_create_metadata.sh
+  template:
+    src:  etc/apache2/mellon/mellon_create_metadata.sh
+    dest: /etc/apache2/mellon/
+    owner: develop
+    group: www-data
+    mode: 0774
