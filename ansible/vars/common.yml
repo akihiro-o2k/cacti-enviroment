@@ -94,4 +94,4 @@
 # 下記のgoogle-chromeのサイトで、chrome及びchromedriverが提供されているstable版のバージョンをチェックの上で定義する。
 # https://googlechromelabs.github.io/chrome-for-testing/
 - chrome_version: '129.0.6668.58'
-- ruby_version: '3.3.0'
+- ruby_version: '3.4.1'
