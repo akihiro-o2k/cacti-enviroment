@@ -172,17 +172,17 @@
   command:
     cmd: "chown -R develop:develop /usr/lib/rbenv"
 
-#- name: is_exist /usr/local/ruby-build
-#  stat:
-#    path: "/usr/local/ruby-build"
-#  register: ruby_build
+- name: is_exist /usr/local/ruby-build
+  stat:
+    path: "/usr/lib/rbenv/plugins/ruby-build"
+  register: ruby_build
 
 - name: git clone ruby-build
   become: yes
   command:
     cmd: "git clone https://github.com/sstephenson/ruby-build.git /usr/lib/rbenv/plugins/ruby-build"
-    #  when:
-    #- ruby_build.stat.exists == false
+  when:
+    - ruby_build.stat.exists == false
 
 - name: is_exist check for /etc/profile.d/rbenv.sh
   stat:
@@ -201,32 +201,47 @@
   when:
     - rbenv_sh.stat.exists == false
 
+
+- name: is_exist /usr/lib/rbenv/versions
+  stat:
+    path: "/usr/lib/rbenv/versions"
+  register: rbenv_vers
+
+- name: create dir /usr/lib/rbenv/versions
+  become: yes
+  command:
+    cmd: "mkdir /usr/lib/rbenv/versions"
+  when:
+   - rbenv_vers.stat.exists == false
+
+- name: set parmisson /usr/lib/rbenv
+  become: yes
+  command:
+    cmd: "chmod -R 777 /usr/lib/rbenv"
+
+ 
 # execute /etc/profile.d/rbenv.sh
 - name: exec /etc/profile.d/rbenv.sh
   become: yes
   command:
-     cmd: '/bin/bash -c /etc/profile.d/rbenv.sh && /bin/bash -c /usr/lib/rbenv/bin/rbenv init'
+     cmd: '/bin/bash -c /etc/profile.d/rbenv.sh'
 
-#- name: rbenv init
-#  become: yes
-#  command:
-#    cmd: '/bin/bash -c /usr/local/rbenv/bin/rbenv init'
+- name: rbenv init
+  become: yes
+  shell: bash -lc "rbenv init -"
 
 # install ruby
-- name: install ruby
+- name: rbenv install ruby
   become: yes
-  command:
-     cmd: "/bin/bash -c /etc/profile.d/rbenv.sh && rbenv install {{ ruby_version }}"
-
+  shell: bash -lc "rbenv install --skip-existing {{ ruby_version }}"
 
 # install ruby
-- name: install ruby
+- name: rbenv global
   become: yes
-  command:
-     cmd: "/bin/bash -c /etc/profile.d/rbenv.sh && rbenv grobal {{ ruby_version }}"
+  shell: bash -lc "rbenv global {{ ruby_version }}"
+
 # ruby gemをインストール
-#- name: gem install selenium-webdriver
-#  become: yes
-#  command:
-#    cmd: "sudo gem install selenium-webdriver"
+- name: gem install selenium-webdriver
+  become: yes
+  shell: bash -lc "gem install selenium-webdriver"
 
