@@ -371,6 +371,27 @@
   when:
     - images_dir.stat.exists == false
 
+
+- name: create directory /var/www/images/debug
+  ansible.builtin.file:
+    path: /var/www/images/debug
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  when:
+    - images_dir.stat.exists == false
+
+- name: create directory /var/www/images/debug/logs
+  ansible.builtin.file:
+    path: /var/www/images/debug/logs
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  when:
+    - images_dir.stat.exists == false
+
 # directory存在判定
 - name: is_exist /etc/lsyncd
   stat:
@@ -418,3 +439,13 @@
     owner: root
     group: root
     mode: 0644
+
+- name: create /etc/logrotate.d/selenium(logのローテーション定義)
+  become: yes
+  template:
+    src: logrotate.d/selenium
+    dest: /etc/logrotate.d/selenium
+    owner: root
+    group: root
+    mode: 0644
+ 

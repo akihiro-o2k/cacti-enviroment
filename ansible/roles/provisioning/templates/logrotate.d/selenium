@@ -1,0 +1,10 @@
+/var/www/images/debug/logs/*.log {
+	daily
+	missingok
+	rotate 7
+	compress
+	delaycompress
+	notifempty
+	create 666 develop www-data
+	sharedscripts
+}
