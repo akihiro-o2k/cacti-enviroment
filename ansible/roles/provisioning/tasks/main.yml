@@ -105,6 +105,16 @@
     owner: develop
     group: develop
     mode: 0775
+  when: stage == 'develop'
+
+- name: upload chromedriver-linux64.zip
+  ansible.builtin.unarchive:
+    src: "/usr/local/packages/chromedriver-linux64.zip"
+    dest: /tmp/
+    owner: develop
+    group: develop
+    mode: 0775
+  when: stage == 'production'
 
 # chromodriverインストールディレクトリの存在確認
 - name: unarchive_dir check for /tmp
@@ -135,6 +145,7 @@
   when:
     - chromedriver.stat.exists == false
 
+# chromedriverにパーミッションを設定
 - name: set permission /usr/local/bin/chromedriver
   become: yes
   command:
@@ -155,11 +166,17 @@
   shell: "chromedriver --version"
   register: chromedriver_version
 
+# util: ファイルの有無をレジスターに登録
 - name: is_exist /usr/local/ebenv
   stat:
     path: "/usr/lib/rbenv"
   register: rbenv
 
+#
+# 以下、rubyで動作するSelenium-driverを動かす為のplay-book
+#
+
+# gitよりrbenvを取得する処理(標準催促のルールでrubyが指定バージョン以上の必要がある為)
 - name: git clone rbenv
   become: yes
   command:
@@ -167,16 +184,19 @@
   when:
     - rbenv.stat.exists == false
 
+# ruby格納ディレクトリのオーナーをdevelopに
 - name: chown rbenv
   become: yes
   command:
     cmd: "chown -R develop:develop /usr/lib/rbenv"
 
+# 後工程の為にdirectory有無判定を変数に格納
 - name: is_exist /usr/local/ruby-build
   stat:
     path: "/usr/lib/rbenv/plugins/ruby-build"
   register: ruby_build
 
+# rubybuildバージョンをなるべく最新化する為に、gitよりruby-buildを取得する。
 - name: git clone ruby-build
   become: yes
   command:
@@ -184,12 +204,13 @@
   when:
     - ruby_build.stat.exists == false
 
+# 後工程の為にdirectory有無判定を変数に格納
 - name: is_exist check for /etc/profile.d/rbenv.sh
   stat:
     path: "/etc/profile.d/rbenv.sh"
   register: rbenv_sh
 
-# add script /etc/profile.d/rbenv.sh
+# ユーザー全体でrbenvで導入したrubyを使用する為に/etc/profile.dにスクリプトを追加
 - name: uplaod /etc/profile.d/rbenv.sh
   become: yes
   template:
@@ -201,12 +222,13 @@
   when:
     - rbenv_sh.stat.exists == false
 
-
+# 後工程の為にdirectory有無判定を変数に格納
 - name: is_exist /usr/lib/rbenv/versions
   stat:
     path: "/usr/lib/rbenv/versions"
   register: rbenv_vers
 
+# rbenvでインストールするrubyを格納する為のディレクトリを追加
 - name: create dir /usr/lib/rbenv/versions
   become: yes
   command:
@@ -214,11 +236,15 @@
   when:
    - rbenv_vers.stat.exists == false
 
+# rbenvのruby誰でも使用可能にする為、パーミッションを緩めに変更
 - name: set parmisson /usr/lib/rbenv
   become: yes
   command:
     cmd: "chmod -R 777 /usr/lib/rbenv"
 
+#
+# 以下、rbenvでのrubyインストレーションに関するplay-book
+#
  
 # execute /etc/profile.d/rbenv.sh
 - name: exec /etc/profile.d/rbenv.sh
@@ -226,16 +252,18 @@
   command:
      cmd: '/bin/bash -c /etc/profile.d/rbenv.sh'
 
+# rbenvを初期化
 - name: rbenv init
   become: yes
   shell: bash -lc "rbenv init -"
 
-# install ruby
-- name: rbenv install ruby
+# rbenvによる、指定バージョンのrubyをインストールする為のコマンド
+# 検証環境側で事前にrbenv install -lコマンドを叩いて導入可能なバージョンを判定の上変数を書き換える事!!
+- name: "rbenv install ruby {{ ruby_version }}"
   become: yes
   shell: bash -lc "rbenv install --skip-existing {{ ruby_version }}"
 
-# install ruby
+# rbenvはディレクトリ単位でrubyバージョンを局所化するので全体で同一バージョンを利用できるように設定するコマンド
 - name: rbenv global
   become: yes
   shell: bash -lc "rbenv global {{ ruby_version }}"
