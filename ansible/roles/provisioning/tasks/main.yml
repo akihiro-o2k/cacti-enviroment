@@ -3,30 +3,36 @@
     upgrade: "yes"
     update_cache: yes
 
-# gitとunzipをインストール
-- name: instoration git and uzip 
+# gitとunzip、Rubyをrbenvでインストールする為のパッケージ、lsyncdをまとめてインストール
+- name: install provisioning-vm native dependency package
   become: yes
   apt:
-    name:
-      - software-properties-common
-      - git
-      - unzip
-      - vim
-      - autoconf
-      - patch
-      - build-essential 
-      - rustc 
-      - libssl-dev 
-      - libyaml-dev 
-      - libreadline6-dev 
-      - zlib1g-dev 
-      - libgmp-dev 
-      - libncurses5-dev 
-      - libffi-dev 
-      - libgdbm6 
-      - libgdbm-dev 
-      - libdb-dev
-      - uuid-dev
+    name: "{{ provisioning_packages }}"
+
+#- name: instoration git and uzip 
+#  become: yes
+#  apt:
+#    name:
+#      - software-properties-common
+#      - git
+#      - unzip
+#      - vim
+#      - autoconf
+#      - patch
+#      - build-essential 
+#      - rustc 
+#      - libssl-dev 
+#      - libyaml-dev 
+#      - libreadline6-dev 
+#      - zlib1g-dev 
+#      - libgmp-dev 
+#      - libncurses5-dev 
+#      - libffi-dev 
+#      - libgdbm6 
+#      - libgdbm-dev 
+#      - libdb-dev
+#      - uuid-dev
+#      - lsyncd
 
 # 手動でppa:ansible/ansibleのGPGKEYを追加
 # ref: https://launchpad.net/~ansible/+archive/ubuntu/ansible
@@ -98,15 +104,17 @@
   debug:
     msg: "{{ chrome_version.stdout }}"
 
+# 事前にchrome-linux64のstableバージョンを確認→var/common.ymlのvar_chrome_versionを更新の上で実行
 - name: download chromedriver-linux64.zip
   ansible.builtin.get_url:
-    url: "https://storage.googleapis.com/chrome-for-testing-public/{{ chrome_version.stdout }}/linux64/chromedriver-linux64.zip"
+    url: "https://storage.googleapis.com/chrome-for-testing-public/{{ var_chrome_version }}/linux64/chromedriver-linux64.zip"
     dest: /tmp/chromedriver-linux64.zip
     owner: develop
     group: develop
     mode: 0775
-  when: stage == 'develop'
+  when: stage == 'development'
 
+# 事前にchrome-linux64のstableバージョンを確認→同一バージョンのchromedriver-linux64.zipをansible実行端末のsrcにダウンロードして実行。
 - name: upload chromedriver-linux64.zip
   ansible.builtin.unarchive:
     src: "/usr/local/packages/chromedriver-linux64.zip"
@@ -264,12 +272,149 @@
   shell: bash -lc "rbenv install --skip-existing {{ ruby_version }}"
 
 # rbenvはディレクトリ単位でrubyバージョンを局所化するので全体で同一バージョンを利用できるように設定するコマンド
-- name: rbenv global
+- name: "rbenv set global {{ ruby_version }}"
   become: yes
   shell: bash -lc "rbenv global {{ ruby_version }}"
 
 # ruby gemをインストール
-- name: gem install selenium-webdriver
+- name: ruby-gem install selenium-webdriver
   become: yes
   shell: bash -lc "gem install selenium-webdriver"
 
+# 後工程の為にdirectory有無判定を変数に格納
+- name: is_exist /usr/local/selenium
+  stat:
+    path: "/usr/local/selenium"
+  register: selenium_dir
+
+
+# gitよりselenium実行スクリプトを取得する処理
+- name: git clone mieruka-selenium script
+  become: yes
+  command:
+    cmd: "git clone https://github.com/akihiro-o2k/selenium.git /usr/local/selenium"
+  when:
+    - selenium_dir.stat.exists == false
+
+ 
+- name: set owner & group /usr/local/selenium
+  become: yes
+  command:
+    cmd: "chown -R develop:develop /usr/local/selenium"
+
+# gitには存在しないパスワード等の定義ファイルをアップロードする。
+- name: upload server_env.sh
+  ansible.builtin.copy:
+    src: "/usr/local/selenium/server_env.sh"
+    dest: /usr/local/selenium/
+    owner: develop
+    group: develop
+    mode: 0775
+
+#
+# 以下、lsyncd関連の設定
+#
+#
+#　ssh秘密鍵をコピー
+- name: upload id_ed25519 
+  ansible.builtin.copy:
+    src: "/home/develop/.ssh/id_ed25519"
+    dest: /home/develop/.ssh/
+    owner: develop
+    group: develop
+    mode: 0600
+
+# ssh公開鍵のコピー
+- name: upload id_ed25519.pub
+  ansible.builtin.copy:
+    src: "/home/develop/.ssh/id_ed25519.pub"
+    dest: /home/develop/.ssh/
+    owner: develop
+    group: develop
+    mode: 0644
+
+# sshの接続時設定ファイルをコピー
+- name: upload ssh-config
+  ansible.builtin.copy:
+    src: "/home/develop/.ssh/config"
+    dest: /home/develop/.ssh/
+    owner: develop
+    group: develop
+    mode: 0664
+
+# lsyncでファイルオーナーとなるwww-dataグループを作成
+- name: Ensure group "www-data"
+  ansible.builtin.group:
+    name: www-data
+    state: present
+
+# developユーザーにセカンダリグループとしてwww-dataを追加
+- name: add secandly group for develop
+  become: yes
+  command:
+    cmd: "usermod -aG www-data develop"
+
+# directory存在判定
+- name: is_exist /var/www/images
+  stat:
+    path: "/var/www/images"
+  register: images_dir
+
+# lsyncでファイルを操作する為のディレクトリを追加
+- name: create directory /var/www/images
+  ansible.builtin.file:
+    path: /var/www/images
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  when:
+    - images_dir.stat.exists == false
+
+# directory存在判定
+- name: is_exist /etc/lsyncd
+  stat:
+    path: "/etc/lsyncd"
+  register: lsyncd_dir
+ 
+# lsyncd設定ファイル格納ディレクトリを追加
+- name: create directory /etc/lsyncd
+  ansible.builtin.file:
+    path: /etc/lsyncd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - lsyncd_dir.stat.exists == false
+
+# ssh公開鍵のコピー
+- name: upload /etc/lsyncd/lsyncd.conf.lua
+  ansible.builtin.copy:
+    src: "/etc/lsyncd/lsyncd.conf.lua"
+    dest: /etc/lsyncd/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: start service lsyncd, in all cases
+  ansible.builtin.service:
+    name: lsyncd
+    state: restarted
+
+# 起動時有効化設定
+- name: lsyncd service state
+  become: yes
+  service:
+    name: lsyncd
+    state: started
+    enabled: yes
+
+- name: create /etc/cron.d/selenium (定期実行スクリプト)
+  become: yes
+  template:
+    src: selenium
+    dest: /etc/cron.d/selenium
+    owner: root
+    group: root
+    mode: 0644
