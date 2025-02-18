@@ -91,7 +91,32 @@
 - images_directory: /var/www/images
 - backlog_directory: /var/www/images/backlog
 
+# provisioning-vmで必要となるパッケージをテストと共用する為に変数化
+- provisioning_packages:
+  - software-properties-common
+  - git
+  - unzip
+  - vim
+  - autoconf
+  - patch
+  - build-essential
+  - rustc
+  - libssl-dev
+  - libyaml-dev
+  - libreadline6-dev
+  - zlib1g-dev
+  - libgmp-dev
+  - libncurses5-dev
+  - libffi-dev
+  - libgdbm6
+  - libgdbm-dev
+  - libdb-dev
+  - uuid-dev
+  - lsyncd
+
+
 # 下記のgoogle-chromeのサイトで、chrome及びchromedriverが提供されているstable版のバージョンをチェックの上で定義する。
+# 商用環境においては、対象となるstableバージョンをダウンロードの上でansible実行VMの/usr/local/packages/に格納する事。
 # https://googlechromelabs.github.io/chrome-for-testing/
-- chrome_version: '129.0.6668.58'
+- var_chrome_version: '133.0.6943.98'
 - ruby_version: '3.4.1'
