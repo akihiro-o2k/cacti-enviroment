@@ -118,5 +118,5 @@
 # 下記のgoogle-chromeのサイトで、chrome及びchromedriverが提供されているstable版のバージョンをチェックの上で定義する。
 # 商用環境においては、対象となるstableバージョンをダウンロードの上でansible実行VMの/usr/local/packages/に格納する事。
 # https://googlechromelabs.github.io/chrome-for-testing/
-- var_chrome_version: '133.0.6943.98'
+- var_chrome_version: '133.0.6943.126'
 - ruby_version: '3.4.1'
