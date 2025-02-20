@@ -9,30 +9,6 @@
   apt:
     name: "{{ provisioning_packages }}"
 
-#- name: instoration git and uzip 
-#  become: yes
-#  apt:
-#    name:
-#      - software-properties-common
-#      - git
-#      - unzip
-#      - vim
-#      - autoconf
-#      - patch
-#      - build-essential 
-#      - rustc 
-#      - libssl-dev 
-#      - libyaml-dev 
-#      - libreadline6-dev 
-#      - zlib1g-dev 
-#      - libgmp-dev 
-#      - libncurses5-dev 
-#      - libffi-dev 
-#      - libgdbm6 
-#      - libgdbm-dev 
-#      - libdb-dev
-#      - uuid-dev
-#      - lsyncd
 
 # 手動でppa:ansible/ansibleのGPGKEYを追加
 # ref: https://launchpad.net/~ansible/+archive/ubuntu/ansible
@@ -371,7 +347,6 @@
   when:
     - images_dir.stat.exists == false
 
-
 - name: create directory /var/www/images/debug
   ansible.builtin.file:
     path: /var/www/images/debug
@@ -409,7 +384,7 @@
   when:
     - lsyncd_dir.stat.exists == false
 
-# ssh公開鍵のコピー
+# upload lsyncd.conf.lua
 - name: upload /etc/lsyncd/lsyncd.conf.lua
   ansible.builtin.copy:
     src: "/etc/lsyncd/lsyncd.conf.lua"
@@ -418,10 +393,11 @@
     group: root
     mode: 0644
 
-- name: start service lsyncd, in all cases
-  ansible.builtin.service:
-    name: lsyncd
-    state: restarted
+
+#- name: start service lsyncd, in all cases
+#  ansible.builtin.service:
+#    name: lsyncd
+#    state: restarted
 
 # 起動時有効化設定
 - name: lsyncd service state
@@ -449,3 +425,33 @@
     group: root
     mode: 0644
  
+# 後工程の為にdirectory有無判定を変数に格納
+- name: is_exist /home/develop/cacti-enviroment
+  stat:
+    path: "/home/develop/cacti-enviroment"
+  register: cactienv_dir
+
+#
+# 以下、ansibleソースコード関連のpaly-book
+#
+- name: git clone cacti-enviroment script
+  become: yes
+  ansible.builtin.git:
+    repo: 'https://github.com/akihiro-o2k/cacti-enviroment.git'
+    dest: /home/develop/cacti-enviroment
+  when:
+    - cactienv_dir.stat.exists == false
+
+- name: chown cacti-enviroment
+  become: yes
+  command:
+    cmd: "chown -R develop:develop /home/develop/cacti-enviroment"
+
+# upload .bashrc
+- name: upload /home/develop/.bashrc
+  ansible.builtin.copy:
+    src: "/home/develop/.bashrc"
+    dest: /home/develop/.bashrc
+    owner: develop
+    group: develop
+    mode: 0764
