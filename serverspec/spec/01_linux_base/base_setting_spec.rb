@@ -35,18 +35,6 @@ describe "[3]:/etc/hosts関連設定の確認" do
   end
 end
 
-
-# test /etc/profile.d/prompt_coler.sh
-#describe 'プロンプト色設定シェルの設定確認' do
-#  describe file('/etc/profile.d/prompt_coler.sh') do
-#    it { should be_file }
-#    it { should be_mode 644 }
-#    it { should be_owned_by 'root' }
-#    it { should be_grouped_into 'root' }
-#    it { should contain 'PS1' }
-#  end
-#end
-
 # systemd-timesyncd
 describe "[4]:NTPD(systemd-timesyncd)の起動と再起動時の動作を確認::" do
   describe service('systemd-timesyncd'), :if => os[:family] == 'ubuntu' do
