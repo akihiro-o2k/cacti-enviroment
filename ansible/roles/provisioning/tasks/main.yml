@@ -133,7 +133,7 @@
 - name: set permission /usr/local/bin/chromedriver
   become: yes
   command:
-     cmd: "chmod 777 /usr/local/bin/chromedriver"
+     cmd: "chmod 755 /usr/local/bin/chromedriver"
 
 # chromedriverにパスが通っているか確認
 - name: check to chromedriver path
@@ -168,11 +168,18 @@
   when:
     - rbenv.stat.exists == false
 
+- name: is_exist /usr/local/ebenv
+  stat:
+    path: "/usr/lib/rbenv"
+  register: rbenv
+
 # ruby格納ディレクトリのオーナーをdevelopに
 - name: chown rbenv
   become: yes
   command:
-    cmd: "chown -R develop:develop /usr/lib/rbenv"
+    cmd: "chown develop:develop /usr/lib/rbenv"
+  when:
+    - rbenv.stat.exists == true
 
 # 後工程の為にdirectory有無判定を変数に格納
 - name: is_exist /usr/local/ruby-build
@@ -224,7 +231,7 @@
 - name: set parmisson /usr/lib/rbenv
   become: yes
   command:
-    cmd: "chmod -R 777 /usr/lib/rbenv"
+    cmd: "chmod -R 755 /usr/lib/rbenv"
 
 #
 # 以下、rbenvでのrubyインストレーションに関するplay-book
@@ -255,7 +262,7 @@
 # ruby gemをインストール
 - name: ruby-gem install selenium-webdriver
   become: yes
-  shell: bash -lc "gem install selenium-webdriver"
+  shell: bash -lc "gem install selenium-webdriver serverspec"
 
 # 後工程の為にdirectory有無判定を変数に格納
 - name: is_exist /usr/local/selenium
@@ -350,6 +357,16 @@
 - name: create directory /var/www/images/debug
   ansible.builtin.file:
     path: /var/www/images/debug
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  when:
+    - images_dir.stat.exists == false
+
+- name: create directory /var/www/images/backlog
+  ansible.builtin.file:
+    path: /var/www/images/backlog
     state: directory
     owner: www-data
     group: www-data
@@ -455,3 +472,18 @@
     owner: develop
     group: develop
     mode: 0764
+
+#
+# ansibleのインストール
+#
+- name: apt install ansible
+  become: yes
+  apt:
+    name:
+      - ansible
+      - python3-pip
+
+
+- name: pip install pexpect
+  become: yes
+  shell: bash -lc 'pip install pexpect'
