@@ -70,7 +70,8 @@
 - db_user_password: cactiuser
 # 独自改修箇所:ミラーサイトとバージョンを同一URIで変数渡し
 # ミラーサイトからパッケージが消失するケースあり。doc/use_of_ansible-galaxy.mdに該当するエラーメッセージ例と対処方法を記載。
-- mariadb_repo: 'deb https://atl.mirrors.knownhost.com/mariadb/repo/11.4/ubuntu'
+# 2025.01.07 mariadbミラーサイトのSSL証明証が無効になっている為、暫定でhttpでアクセス。
+- mariadb_repo: 'deb http://atl.mirrors.knownhost.com/mariadb/repo/11.4/ubuntu'
 - import_sql_file: true
 - sql_file_name:
   - { db: 'cactidb', file: '01_criate_cacti_tables.sql' }
@@ -89,3 +90,33 @@
 
 - images_directory: /var/www/images
 - backlog_directory: /var/www/images/backlog
+
+# provisioning-vmで必要となるパッケージをテストと共用する為に変数化
+- provisioning_packages:
+  - software-properties-common
+  - git
+  - unzip
+  - vim
+  - autoconf
+  - patch
+  - build-essential
+  - rustc
+  - libssl-dev
+  - libyaml-dev
+  #- libreadline6-dev
+  - zlib1g-dev
+  - libgmp-dev
+  - libncurses5-dev
+  - libffi-dev
+  - libgdbm6
+  - libgdbm-dev
+  - libdb-dev
+  - uuid-dev
+  - lsyncd
+
+
+# 下記のgoogle-chromeのサイトで、chrome及びchromedriverが提供されているstable版のバージョンをチェックの上で定義する。
+# 商用環境においては、対象となるstableバージョンをダウンロードの上でansible実行VMの/usr/local/packages/に格納する事。
+# https://googlechromelabs.github.io/chrome-for-testing/
+- var_chrome_version: '133.0.6943.141'
+- ruby_version: '3.4.1'

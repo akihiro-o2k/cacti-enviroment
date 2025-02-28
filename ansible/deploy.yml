@@ -41,3 +41,17 @@
     - zabbix-agent
     - images
     - html
+
+- hosts: provisioning
+  vars_files:
+    - vars/{{ stage }}.yml
+    - vars/common.yml
+  roles:
+    - before-install
+    - linux-base
+    - provisioning
+  tags:
+    - before-install
+    - linux-base
+    - provisioning
+

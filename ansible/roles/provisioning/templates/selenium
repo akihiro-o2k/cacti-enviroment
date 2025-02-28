@@ -1,0 +1,4 @@
+# NPM map capture script(selenium)
+*/5 * * * *	/bin/bash -cl 'cd /usr/local/selenium && source server_env.sh && ruby script.rb'
+# delete old backlog file
+3 0 * * *	/usr/bin/find /var/images/backlog/ -ctime +3 -delete

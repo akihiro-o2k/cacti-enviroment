@@ -1,0 +1,488 @@
+- name: Update and upgrade apt packages
+  apt:
+    upgrade: "yes"
+    update_cache: yes
+
+# gitとunzip、Rubyをrbenvでインストールする為のパッケージ、lsyncdをまとめてインストール
+- name: install provisioning-vm native dependency package
+  become: yes
+  apt:
+    name: "{{ provisioning_packages }}"
+
+
+# 手動でppa:ansible/ansibleのGPGKEYを追加
+# ref: https://launchpad.net/~ansible/+archive/ubuntu/ansible
+- name: uplaod ppa:ansible Key file
+  become: yes
+  template:
+    src:  tmp/ppa_ansible.key
+    dest: /tmp/ppa_ansible.key
+    owner: root
+    group: root
+    mode: 0644
+
+- name: add ppa:ansible apt-key
+  become: yes
+  ansible.builtin.apt_key:
+    file: /tmp/ppa_ansible.key
+    state: present
+
+# 手動で/etc/apt/sources.listにリポジトリを追加
+- name: Add ppa:ansible/ansible Repository
+  become: yes
+  apt_repository:
+    repo: "deb https://ppa.launchpadcontent.net/ansible/ansible/ubuntu {{os_alias}} main"
+    state: present
+    filename: ppa_ansible
+
+# 手動でgoogle-chromeのGPGKEYを追加
+# ref: https://qiita.com/ekzemplaro/items/11539f5bd9b80a6c7dca
+# ref: https://www.slimjet.com/chrome/google-chrome-old-version.php 
+- name: uplaod google-chrome Key file
+  template:
+    src:  tmp/google-chrome.key
+    dest: /tmp/google-chrome.key
+    owner: root
+    group: root
+    mode: 0644
+
+- name: add google-chrome apt-key
+  become: yes
+  ansible.builtin.apt_key:
+    file: /tmp/google-chrome.key
+    state: present
+
+# 手動で/etc/apt/sources.listにリポジトリを追加
+- name: Add google-chrome Repository
+  become: yes
+  apt_repository:
+    repo: "deb http://dl.google.com/linux/chrome/deb/ stable main"
+    state: present
+    filename: google-chrome
+
+
+# Aptリポジトリを追加したのでパッケージ取得のためにaptリポジトリの更新
+- name: Apt update
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: Install google-chrome with specified version 
+  become: yes
+  apt:
+    name: "google-chrome-stable"
+
+- name: chrome-version check
+  shell: "google-chrome --version | cut -d' ' -f3"
+  register: chrome_version
+
+- name: debug chrome_version
+  debug:
+    msg: "{{ chrome_version.stdout }}"
+
+# 事前にchrome-linux64のstableバージョンを確認→var/common.ymlのvar_chrome_versionを更新の上で実行
+- name: download chromedriver-linux64.zip
+  ansible.builtin.get_url:
+    url: "https://storage.googleapis.com/chrome-for-testing-public/{{ var_chrome_version }}/linux64/chromedriver-linux64.zip"
+    dest: /tmp/chromedriver-linux64.zip
+    owner: develop
+    group: develop
+    mode: 0775
+  when: stage == 'development'
+
+# 事前にchrome-linux64のstableバージョンを確認→同一バージョンのchromedriver-linux64.zipをansible実行端末のsrcにダウンロードして実行。
+- name: upload chromedriver-linux64.zip
+  ansible.builtin.unarchive:
+    src: "/usr/local/packages/chromedriver-linux64.zip"
+    dest: /tmp/
+    owner: develop
+    group: develop
+    mode: 0775
+  when: stage == 'production'
+
+# chromodriverインストールディレクトリの存在確認
+- name: unarchive_dir check for /tmp
+  stat:
+    path: "/tmp/chromedriver-linux64"
+  register: chromedriver_dir
+
+# chromedriver_dirが存在しないケースではunzipして作成
+- name: unzip chromedriver-linux64.zip
+  ansible.builtin.unarchive:
+    src: "/tmp/chromedriver-linux64.zip"
+    dest: /tmp/
+    remote_src: yes
+  when:
+    - chromedriver_dir.stat.exists == false
+
+# 再度chromodriverインストールディレクトリの存在確認
+- name: unarchive_dir check for /usr/local/bin
+  stat:
+    path: "/usr/local/bin/chromedriver"
+  register: chromedriver
+
+# Chrome-driverの配置
+- name: install chromodriver
+  become: yes
+  command:
+    cmd: "mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/"
+  when:
+    - chromedriver.stat.exists == false
+
+# chromedriverにパーミッションを設定
+- name: set permission /usr/local/bin/chromedriver
+  become: yes
+  command:
+     cmd: "chmod 755 /usr/local/bin/chromedriver"
+
+# chromedriverにパスが通っているか確認
+- name: check to chromedriver path
+  shell: "whereis chromedriver"
+  register: chromedriver_path
+
+# pathを画面出力(動作確認用)
+- name: debug chromedriver_path
+  debug:
+    msg: "{{ chromedriver_path.stdout }}"
+
+# versionの表示でchromodriverの実行ファイル動作確認
+- name: execute chromedriver --version command
+  shell: "chromedriver --version"
+  register: chromedriver_version
+
+# util: ファイルの有無をレジスターに登録
+- name: is_exist /usr/local/ebenv
+  stat:
+    path: "/usr/lib/rbenv"
+  register: rbenv
+
+#
+# 以下、rubyで動作するSelenium-driverを動かす為のplay-book
+#
+
+# gitよりrbenvを取得する処理(標準催促のルールでrubyが指定バージョン以上の必要がある為)
+- name: git clone rbenv
+  become: yes
+  command:
+    cmd: "git clone https://github.com/rbenv/rbenv.git /usr/lib/rbenv"
+  when:
+    - rbenv.stat.exists == false
+
+- name: is_exist /usr/local/ebenv
+  stat:
+    path: "/usr/lib/rbenv"
+  register: rbenv
+
+# ruby格納ディレクトリのオーナーをdevelopに
+- name: chown rbenv
+  become: yes
+  command:
+    cmd: "chown develop:develop /usr/lib/rbenv"
+  when:
+    - rbenv.stat.exists == true
+
+# 後工程の為にdirectory有無判定を変数に格納
+- name: is_exist /usr/local/ruby-build
+  stat:
+    path: "/usr/lib/rbenv/plugins/ruby-build"
+  register: ruby_build
+
+# rubybuildバージョンをなるべく最新化する為に、gitよりruby-buildを取得する。
+- name: git clone ruby-build
+  become: yes
+  command:
+    cmd: "git clone https://github.com/sstephenson/ruby-build.git /usr/lib/rbenv/plugins/ruby-build"
+  when:
+    - ruby_build.stat.exists == false
+
+# 後工程の為にdirectory有無判定を変数に格納
+- name: is_exist check for /etc/profile.d/rbenv.sh
+  stat:
+    path: "/etc/profile.d/rbenv.sh"
+  register: rbenv_sh
+
+# ユーザー全体でrbenvで導入したrubyを使用する為に/etc/profile.dにスクリプトを追加
+- name: uplaod /etc/profile.d/rbenv.sh
+  become: yes
+  template:
+    src:  etc/profile.d/rbenv.sh
+    dest: /etc/profile.d/rbenv.sh
+    owner: root
+    group: root
+    mode: 0755
+  when:
+    - rbenv_sh.stat.exists == false
+
+# 後工程の為にdirectory有無判定を変数に格納
+- name: is_exist /usr/lib/rbenv/versions
+  stat:
+    path: "/usr/lib/rbenv/versions"
+  register: rbenv_vers
+
+# rbenvでインストールするrubyを格納する為のディレクトリを追加
+- name: create dir /usr/lib/rbenv/versions
+  become: yes
+  command:
+    cmd: "mkdir /usr/lib/rbenv/versions"
+  when:
+   - rbenv_vers.stat.exists == false
+
+# rbenvのruby誰でも使用可能にする為、パーミッションを緩めに変更
+- name: set parmisson /usr/lib/rbenv
+  become: yes
+  command:
+    cmd: "chmod -R 755 /usr/lib/rbenv"
+
+#
+# 以下、rbenvでのrubyインストレーションに関するplay-book
+#
+ 
+# execute /etc/profile.d/rbenv.sh
+- name: exec /etc/profile.d/rbenv.sh
+  become: yes
+  command:
+     cmd: '/bin/bash -c /etc/profile.d/rbenv.sh'
+
+# rbenvを初期化
+- name: rbenv init
+  become: yes
+  shell: bash -lc "rbenv init -"
+
+# rbenvによる、指定バージョンのrubyをインストールする為のコマンド
+# 検証環境側で事前にrbenv install -lコマンドを叩いて導入可能なバージョンを判定の上変数を書き換える事!!
+- name: "rbenv install ruby {{ ruby_version }}"
+  become: yes
+  shell: bash -lc "rbenv install --skip-existing {{ ruby_version }}"
+
+# rbenvはディレクトリ単位でrubyバージョンを局所化するので全体で同一バージョンを利用できるように設定するコマンド
+- name: "rbenv set global {{ ruby_version }}"
+  become: yes
+  shell: bash -lc "rbenv global {{ ruby_version }}"
+
+# ruby gemをインストール
+- name: ruby-gem install selenium-webdriver
+  become: yes
+  shell: bash -lc "gem install selenium-webdriver serverspec"
+
+# 後工程の為にdirectory有無判定を変数に格納
+- name: is_exist /usr/local/selenium
+  stat:
+    path: "/usr/local/selenium"
+  register: selenium_dir
+
+
+# gitよりselenium実行スクリプトを取得する処理
+- name: git clone mieruka-selenium script
+  become: yes
+  command:
+    cmd: "git clone https://github.com/akihiro-o2k/selenium.git /usr/local/selenium"
+  when:
+    - selenium_dir.stat.exists == false
+
+ 
+- name: set owner & group /usr/local/selenium
+  become: yes
+  command:
+    cmd: "chown -R develop:develop /usr/local/selenium"
+
+# gitには存在しないパスワード等の定義ファイルをアップロードする。
+- name: upload server_env.sh
+  ansible.builtin.copy:
+    src: "/usr/local/selenium/server_env.sh"
+    dest: /usr/local/selenium/
+    owner: develop
+    group: develop
+    mode: 0775
+
+#
+# 以下、lsyncd関連の設定
+#
+#
+#　ssh秘密鍵をコピー
+- name: upload id_ed25519 
+  ansible.builtin.copy:
+    src: "/home/develop/.ssh/id_ed25519"
+    dest: /home/develop/.ssh/
+    owner: develop
+    group: develop
+    mode: 0600
+
+# ssh公開鍵のコピー
+- name: upload id_ed25519.pub
+  ansible.builtin.copy:
+    src: "/home/develop/.ssh/id_ed25519.pub"
+    dest: /home/develop/.ssh/
+    owner: develop
+    group: develop
+    mode: 0644
+
+# sshの接続時設定ファイルをコピー
+- name: upload ssh-config
+  ansible.builtin.copy:
+    src: "/home/develop/.ssh/config"
+    dest: /home/develop/.ssh/
+    owner: develop
+    group: develop
+    mode: 0664
+
+# lsyncでファイルオーナーとなるwww-dataグループを作成
+- name: Ensure group "www-data"
+  ansible.builtin.group:
+    name: www-data
+    state: present
+
+# developユーザーにセカンダリグループとしてwww-dataを追加
+- name: add secandly group for develop
+  become: yes
+  command:
+    cmd: "usermod -aG www-data develop"
+
+# directory存在判定
+- name: is_exist /var/www/images
+  stat:
+    path: "/var/www/images"
+  register: images_dir
+
+# lsyncでファイルを操作する為のディレクトリを追加
+- name: create directory /var/www/images
+  ansible.builtin.file:
+    path: /var/www/images
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  when:
+    - images_dir.stat.exists == false
+
+- name: create directory /var/www/images/debug
+  ansible.builtin.file:
+    path: /var/www/images/debug
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  when:
+    - images_dir.stat.exists == false
+
+- name: create directory /var/www/images/backlog
+  ansible.builtin.file:
+    path: /var/www/images/backlog
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  when:
+    - images_dir.stat.exists == false
+
+- name: create directory /var/www/images/debug/logs
+  ansible.builtin.file:
+    path: /var/www/images/debug/logs
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  when:
+    - images_dir.stat.exists == false
+
+# directory存在判定
+- name: is_exist /etc/lsyncd
+  stat:
+    path: "/etc/lsyncd"
+  register: lsyncd_dir
+ 
+# lsyncd設定ファイル格納ディレクトリを追加
+- name: create directory /etc/lsyncd
+  ansible.builtin.file:
+    path: /etc/lsyncd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - lsyncd_dir.stat.exists == false
+
+# upload lsyncd.conf.lua
+- name: upload /etc/lsyncd/lsyncd.conf.lua
+  ansible.builtin.copy:
+    src: "/etc/lsyncd/lsyncd.conf.lua"
+    dest: /etc/lsyncd/
+    owner: root
+    group: root
+    mode: 0644
+
+
+- name: start service lsyncd, in all cases
+  ansible.builtin.service:
+    name: lsyncd
+    state: restarted
+
+# 起動時有効化設定
+- name: lsyncd service state
+  service:
+    name: lsyncd
+    state: started
+    enabled: yes
+
+- name: create /etc/cron.d/selenium (定期実行スクリプト)
+  become: yes
+  template:
+    src: selenium
+    dest: /etc/cron.d/selenium
+    owner: root
+    group: root
+    mode: 0644
+
+- name: create /etc/logrotate.d/selenium(logのローテーション定義)
+  become: yes
+  template:
+    src: logrotate.d/selenium
+    dest: /etc/logrotate.d/selenium
+    owner: root
+    group: root
+    mode: 0644
+ 
+# 後工程の為にdirectory有無判定を変数に格納
+- name: is_exist /home/develop/cacti-enviroment
+  stat:
+    path: "/home/develop/cacti-enviroment"
+  register: cactienv_dir
+
+#
+# 以下、ansibleソースコード関連のpaly-book
+#
+- name: git clone cacti-enviroment script
+  become: yes
+  ansible.builtin.git:
+    repo: 'https://github.com/akihiro-o2k/cacti-enviroment.git'
+    dest: /home/develop/cacti-enviroment
+  when:
+    - cactienv_dir.stat.exists == false
+
+- name: chown cacti-enviroment
+  become: yes
+  command:
+    cmd: "chown -R develop:develop /home/develop/cacti-enviroment"
+
+# upload .bashrc
+- name: upload /home/develop/.bashrc
+  ansible.builtin.copy:
+    src: "/home/develop/.bashrc"
+    dest: /home/develop/.bashrc
+    owner: develop
+    group: develop
+    mode: 0764
+
+#
+# ansibleのインストール
+#
+- name: apt install ansible
+  become: yes
+  apt:
+    name:
+      - ansible
+      - python3-pip
+
+
+- name: pip install pexpect
+  become: yes
+  shell: bash -lc 'pip install pexpect'
