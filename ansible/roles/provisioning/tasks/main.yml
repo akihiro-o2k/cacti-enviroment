@@ -411,14 +411,13 @@
     mode: 0644
 
 
-#- name: start service lsyncd, in all cases
-#  ansible.builtin.service:
-#    name: lsyncd
-#    state: restarted
+- name: start service lsyncd, in all cases
+  ansible.builtin.service:
+    name: lsyncd
+    state: restarted
 
 # 起動時有効化設定
 - name: lsyncd service state
-  become: yes
   service:
     name: lsyncd
     state: started
