@@ -160,6 +160,12 @@
 # 以下、rubyで動作するSelenium-driverを動かす為のplay-book
 #
 
+# 商用環境ではgitをproxy経由で取得できるように設定する。
+- name: git setup http proxy
+  shell: "git config --global http.proxy http://{{ proxy_server }}:{{  proxy_port }}"
+  when: stage == 'production'
+
+
 # gitよりrbenvを取得する処理(標準催促のルールでrubyが指定バージョン以上の必要がある為)
 - name: git clone rbenv
   become: yes

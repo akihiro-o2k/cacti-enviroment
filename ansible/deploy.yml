@@ -50,8 +50,10 @@
     - before-install
     - linux-base
     - provisioning
+    - edm
   tags:
     - before-install
     - linux-base
     - provisioning
+    - edm
 
