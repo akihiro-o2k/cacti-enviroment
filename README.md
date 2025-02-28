@@ -63,6 +63,7 @@
                   ├── cacti02     10.223.164.109 (cacti02号機)
                   ├── provision   10.223.164.110 (管理用VM)
                   ├── cacti03     10.223.164.112 (Cacti系VM入れ替え作業で使用するcacti03号機)
+                  ├── provi       10.223.164.112 (管理用VMVM入れ替え作業で使用する場合も同一IPだがホスト名で差別化)
                   ├── orion03     10.223.164.113 (orion03号機)
                   ├── orion04     10.223.164.114 (orion04号機)
                   ├── orion_vip   10.223.164.115 (orion HA対応用のVIP)
@@ -455,6 +456,8 @@
           # rake serverspec:[target_host]
           # -> [target_host]は/etc/hostsと~develop/.ssh/configで事前設定。
           rake serverspec:cacti01
+          # 2025年下期追加:管理用VMの構築時は下記コマンドとなる。
+          rake serverspec:provi
           ```
 
         - 期待するserverspec戻り値:テスト内容をクリア出来ない事を表すRed表示。
@@ -476,6 +479,8 @@
           ansible-playbook -i ${ENVIROMENT}.ini -l materia01 deploy.yml -vv
           # 実際のcacti01/02/03構築を行うansible-playbook実行コマンド
           ansible-playbook -i ${ENVIROMENT}.ini -l cacti01 deploy.yml -vvv
+          # 2025年下期追加:管理用VMの構築時は下記コマンドとなる。
+          ansible-playbook -i ${ENVIROMENT}.ini -l provi deploy.yml -vv
           ```
 
     1. serverspecの再実行(設定完了を確認)
